@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
-import { SubscriptionStatus } from "@/components/subscription";
+import { SubscriptionStatus, PaymentHistory } from "@/components/subscription";
 import { Toaster } from "@/components/ui/toaster";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function SubscriptionPage() {
   const supabase = await createClient();
@@ -68,11 +69,24 @@ export default async function SubscriptionPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <SubscriptionStatus userId={user.id} school={school} />
-        </div>
+        <Tabs defaultValue="subscription" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="subscription">サブスクリプション</TabsTrigger>
+            <TabsTrigger value="history">決済履歴</TabsTrigger>
+          </TabsList>
+          <TabsContent value="subscription" className="mt-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <SubscriptionStatus userId={user.id} school={school} />
+            </div>
+          </TabsContent>
+          <TabsContent value="history" className="mt-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <PaymentHistory userId={user.id} />
+            </div>
+          </TabsContent>
+        </Tabs>
 
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-gray-500 mt-6">
           <p>※ サブスクリプションに関するご質問は、お問い合わせフォームからお願いします。</p>
           <p>※ 決済情報はStripeによって安全に管理されています。</p>
         </div>

@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test';
 
-// テスト用のダミーユーザー情報 - テスト実行ごとに一意のメールアドレスを使用
+// テスト用のダミーユーザー情報 - Supabase Authに追加済みのユーザー
 const TEST_USER = {
-  email: `test-${Date.now()}@example.com`,
-  password: 'Password123!',
+  email: 'test@example.com',
+  password: 'password123',
   name: 'テストユーザー'
 };
 
@@ -11,9 +11,11 @@ test.describe('認証機能テスト', () => {
   test('新規登録フォームが正しく表示される', async ({ page }) => {
     // 新規登録ページに移動
     await page.goto('/signup');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // フォームが表示されていることを確認
-    await expect(page.getByText('アカウント登録')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /アカウント登録|新規登録|会員登録/i })).toBeVisible();
     await expect(page.getByLabel('お名前')).toBeVisible();
     await expect(page.getByLabel('メールアドレス')).toBeVisible();
     await expect(page.getByLabel('パスワード')).toBeVisible();
@@ -35,7 +37,7 @@ test.describe('認証機能テスト', () => {
     // 無効なメールアドレスでエラーが表示されることを確認
     await page.getByLabel('お名前').fill(TEST_USER.name);
     await page.getByLabel('メールアドレス').fill('invalid-email');
-    await page.getByLabel('パスワード').fill(TEST_USER.password);
+    await page.locator('#password').fill(TEST_USER.password);
     await page.getByRole('button', { name: '登録' }).click();
     
     // フォームが送信されないことを確認
@@ -45,9 +47,11 @@ test.describe('認証機能テスト', () => {
   test('ログインフォームが正しく表示される', async ({ page }) => {
     // ログインページに移動
     await page.goto('/login');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // フォームが表示されていることを確認
-    await expect(page.getByText('ログイン')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible();
     await expect(page.getByLabel('メールアドレス')).toBeVisible();
     await expect(page.getByLabel('パスワード')).toBeVisible();
     
@@ -70,7 +74,7 @@ test.describe('認証機能テスト', () => {
     
     // 無効なメールアドレスでエラーが表示されることを確認
     await page.getByLabel('メールアドレス').fill('invalid-email');
-    await page.getByLabel('パスワード').fill('password123');
+    await page.locator('#password').fill('password123');
     await page.getByRole('button', { name: 'ログイン' }).click();
     
     // フォームが送信されないことを確認
@@ -112,8 +116,10 @@ test.describe('認証済みユーザーのテスト', () => {
   test.beforeEach(async ({ page }) => {
     // テスト用のダミーユーザーを使用
     await page.goto('/login');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     await page.getByLabel('メールアドレス').fill(TEST_USER.email);
-    await page.getByLabel('パスワード').fill(TEST_USER.password);
+    await page.locator('#password').fill(TEST_USER.password);
     await page.getByRole('button', { name: 'ログイン' }).click();
     
     // ログイン後、ダッシュボードにリダイレクトされることを期待

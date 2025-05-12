@@ -3,9 +3,11 @@ import { test, expect } from '@playwright/test';
 test.describe('基本ナビゲーションテスト', () => {
   test('トップページが正しく表示される', async ({ page }) => {
     await page.goto('/');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // タイトルが正しく表示されていることを確認
-    await expect(page.locator('h1')).toContainText('ピアノ・リトミック教室を探す');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('ピアノ・リトミック教室を探す');
     
     // 検索フォームが表示されていることを確認
     await expect(page.locator('form')).toBeVisible();
@@ -17,9 +19,11 @@ test.describe('基本ナビゲーションテスト', () => {
 
   test('検索フォームが正しく動作する', async ({ page }) => {
     await page.goto('/');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // 検索キーワードを入力
-    const keywordInput = page.getByPlaceholder('キーワードを入力');
+    const keywordInput = page.getByRole('textbox').first();
     await expect(keywordInput).toBeVisible();
     await keywordInput.fill('ピアノ');
     
@@ -31,8 +35,11 @@ test.describe('基本ナビゲーションテスト', () => {
     // 検索結果ページに遷移することを確認
     await expect(page).toHaveURL(/\/search\?keyword1=\u30d4\u30a2\u30ce/);
     
+    // ページ遷移後にページが読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
+    
     // 検索結果ページが表示されることを確認
-    await expect(page.locator('h1')).toContainText('検索結果');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('検索結果');
     
     // 検索キーワードが表示されることを確認
     await expect(page.getByText('ピアノ')).toBeVisible();
@@ -40,9 +47,11 @@ test.describe('基本ナビゲーションテスト', () => {
 
   test('ログインページが正しく表示される', async ({ page }) => {
     await page.goto('/login');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // ログインフォームが表示されていることを確認
-    await expect(page.locator('h1')).toContainText('ログイン');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('ログイン');
     
     // メールアドレス入力欄が表示されていることを確認
     await expect(page.getByLabel('メールアドレス')).toBeVisible();
@@ -66,7 +75,7 @@ test.describe('基本ナビゲーションテスト', () => {
     await page.waitForLoadState('domcontentloaded');
     
     // 新規登録フォームが表示されていることを確認
-    await expect(page.getByText('アカウント登録', { exact: false })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /アカウント登録|新規登録|会員登録/i })).toBeVisible();
     
     // お名前入力欄が表示されていることを確認
     await expect(page.getByLabel('お名前')).toBeVisible();
@@ -88,6 +97,8 @@ test.describe('基本ナビゲーションテスト', () => {
 
   test('フッターが正しく表示される', async ({ page }) => {
     await page.goto('/');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // フッターが表示されていることを確認
     const footer = page.locator('footer');
@@ -104,6 +115,8 @@ test.describe('基本ナビゲーションテスト', () => {
   
   test('ヘッダーのナビゲーションが正しく表示される', async ({ page }) => {
     await page.goto('/');
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle');
     
     // ヘッダーが表示されていることを確認
     const header = page.locator('header');

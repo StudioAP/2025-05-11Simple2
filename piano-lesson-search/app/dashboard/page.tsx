@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
-import { DashboardStats } from "@/components/dashboard/dashboard-stats";
 import { SubscriptionStatus } from "@/components/dashboard/subscription-status";
+import { EmailVerificationStatus } from "@/components/auth/email-verification-status-improved";
+import { Suspense } from "react";
+import { PageLoader } from "@/components/ui/loading";
+import { FadeIn, SlideIn } from "@/components/ui/animations";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -36,18 +39,28 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="text-3xl font-bold">マイページ</h1>
-        {!school && (
-          <Link href="/dashboard/school">
-            <Button>教室情報を登録する</Button>
-          </Link>
-        )}
-      </div>
+      <SlideIn direction="down" duration={500}>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <h1 className="text-3xl font-bold">マイページ</h1>
+          {!school && (
+            <Link href="/dashboard/school">
+              <Button>教室情報を登録する</Button>
+            </Link>
+          )}
+        </div>
+      </SlideIn>
+
+      {/* メール認証ステータス */}
+      <SlideIn direction="up" duration={500} delay={100}>
+        <Suspense fallback={<PageLoader message="メール認証状況を確認中..." />}>
+          <EmailVerificationStatus />
+        </Suspense>
+      </SlideIn>
 
       {profile && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">プロフィール</h2>
+        <SlideIn direction="up" duration={500} delay={200}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-300">
+            <h2 className="text-xl font-semibold mb-4">プロフィール</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">お名前</p>
@@ -74,11 +87,13 @@ export default async function DashboardPage() {
             </Link>
           </div>
         </div>
+        </SlideIn>
       )}
 
       {school ? (
         <>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <SlideIn direction="up" duration={500} delay={300}>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
               <h2 className="text-xl font-semibold">教室情報</h2>
               <SubscriptionStatus status={school.subscription_status} />
@@ -128,19 +143,20 @@ export default async function DashboardPage() {
               )}
             </div>
           </div>
-
-          <DashboardStats schoolId={school.id} />
+          </SlideIn>
         </>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
-          <h2 className="text-xl font-semibold mb-4">教室情報が登録されていません</h2>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
-            教室情報を登録して、ピアノ・リトミック教室検索サイトに掲載しましょう。
-          </p>
-          <Link href="/dashboard/school">
-            <Button>教室情報を登録する</Button>
-          </Link>
-        </div>
+        <FadeIn duration={500} delay={300}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center hover:shadow-lg transition-shadow duration-300">
+            <h2 className="text-xl font-semibold mb-4">教室情報が登録されていません</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
+              教室情報を登録して、ピアノ・リトミック教室検索サイトに掲載しましょう。
+            </p>
+            <Link href="/dashboard/school">
+              <Button>教室情報を登録する</Button>
+            </Link>
+          </div>
+        </FadeIn>
       )}
     </div>
   );

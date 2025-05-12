@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/server";
 import { ContactForm } from "@/components/schools/contact-form";
 import { SchoolGallery } from "@/components/schools/school-gallery";
 import { SchoolAnnouncement } from "@/components/schools/school-announcement";
-import { ViewTracker } from "@/components/schools/view-tracker";
 
 export default async function SchoolDetailPage({
   params,
@@ -46,9 +45,6 @@ export default async function SchoolDetailPage({
 
   return (
     <div className="container mx-auto py-8 px-4">
-      {/* 閲覧数を記録するクライアントコンポーネント */}
-      <ViewTracker schoolId={params.id} />
-      
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="p-6 md:p-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">

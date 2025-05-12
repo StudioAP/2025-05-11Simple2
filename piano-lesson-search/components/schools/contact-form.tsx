@@ -7,19 +7,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
-type ContactFormProps = {
+interface ContactFormProps {
   schoolId: string;
   schoolName: string;
   contactEmail: string;
-};
+}
 
 export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormProps) {
   const router = useRouter();
   const supabase = createClient();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +56,7 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
       }
 
       // APIを呼び出してメール送信
-      const response = await fetch("/api/contact", {
+      const response = await fetch("/api/contact/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,16 +64,18 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
         body: JSON.stringify({
           schoolId,
           schoolName,
-          contactEmail,
+          recipientEmail: contactEmail,
           name: formData.name,
           email: formData.email,
+          phone: formData.phone,
           message: formData.message,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "メール送信に失敗しました");
+        throw new Error(data.error || "メール送信に失敗しました");
       }
       
       // 成功
@@ -76,15 +83,27 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
       setFormData({
         name: "",
         email: "",
+        phone: "",
         message: "",
       });
-    } catch (err) {
+
+      toast({
+        title: "送信完了",
+        description: "お問い合わせが正常に送信されました。",
+      });
+    } catch (err: any) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("問い合わせ送信中にエラーが発生しました。もう一度お試しください。");
       }
       console.error("問い合わせ送信エラー:", err);
+      
+      toast({
+        variant: "destructive",
+        title: "エラーが発生しました",
+        description: err.message || "メール送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -93,22 +112,13 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
   if (success) {
     return (
       <div className="text-center py-8">
-        <div className="mb-6 text-green-600 dark:text-green-400">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-16 w-16 mx-auto"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
+        <Alert className="bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-900 mb-6">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <AlertDescription className="text-green-700 dark:text-green-300 ml-2">
+            お問い合わせが送信されました。教室からの返信をお待ちください。
+          </AlertDescription>
+        </Alert>
+        
         <h3 className="text-xl font-bold mb-2">お問い合わせを送信しました</h3>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           {schoolName}へのお問い合わせありがとうございます。<br />
@@ -122,9 +132,10 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="ml-2">{error}</AlertDescription>
+        </Alert>
       )}
 
       <div className="space-y-2">
@@ -153,6 +164,19 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="phone">電話番号</Label>
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="090-1234-5678"
+          disabled={isSubmitting}
+        />
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="message">お問い合わせ内容 <span className="text-red-500">*</span></Label>
         <Textarea
           id="message"
@@ -174,7 +198,14 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
 
       <div className="flex justify-center">
         <Button type="submit" disabled={isSubmitting} className="px-8">
-          {isSubmitting ? "送信中..." : "送信する"}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              送信中...
+            </>
+          ) : (
+            "送信する"
+          )}
         </Button>
       </div>
     </form>

@@ -5,7 +5,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import { Spinner } from "@/components/ui/loading";
+import { ErrorMessage, PageError } from "@/components/ui/error";
+import { FadeIn } from "@/components/ui/animations";
 
 type School = {
   id: string;
@@ -169,27 +172,48 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
   }, [keywords, searchParams, PAGE_SIZE]);
 
   if (loading) {
-    return <div className="text-center py-8">検索中...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <Spinner size="lg" text="検索中..." />
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center py-8 text-red-500">{error}</div>;
+    return (
+      <ErrorMessage 
+        title="検索エラー"
+        message={error}
+        severity="error"
+        className="my-8"
+        onRetry={() => {
+          setLoading(true);
+          setError(null);
+          // 現在のURLパラメータを維持したまま再検索
+          const params = new URLSearchParams(searchParams.toString());
+          window.location.href = `/search?${params.toString()}`;
+        }}
+      />
+    );
   }
 
   if (schools.length === 0 && !loading) {
     return (
-      <div className="text-center py-12">
-        <p className="text-lg mb-4">検索条件に一致する教室が見つかりませんでした。</p>
-        <p className="text-gray-500 mb-6">別のキーワードで検索するか、フィルターを変更してみてください。</p>
-        <div className="flex justify-center space-x-4">
-          <Link href="/">
-            <Button>トップページに戻る</Button>
-          </Link>
-          <Link href="/search">
-            <Button variant="outline">フィルターをリセット</Button>
-          </Link>
+      <FadeIn duration={500}>
+        <div className="text-center py-12">
+          <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-4">検索条件に一致する教室が見つかりませんでした</h3>
+          <p className="text-gray-500 mb-6">別のキーワードで検索するか、フィルターを変更してみてください。</p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/">
+              <Button>トップページに戻る</Button>
+            </Link>
+            <Link href="/search">
+              <Button variant="outline">フィルターをリセット</Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      </FadeIn>
     );
   }
 
@@ -205,44 +229,48 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-500">{totalCount}件の教室が見つかりました（{currentPage}/{totalPages}ページ）</p>
+      <FadeIn duration={300}>
+        <p className="text-sm text-gray-500">{totalCount}件の教室が見つかりました（{currentPage}/{totalPages}ページ）</p>
+      </FadeIn>
       
-      {schools.map((school) => (
-        <div key={school.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1">
-              <h3 className="text-xl font-bold mb-2">{school.name}</h3>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs rounded-full">
-                  {school.school_type_name}
-                </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {school.area}
-                </span>
+      {schools.map((school, index) => (
+        <FadeIn key={school.id} duration={500} delay={index * 100}>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-2">{school.name}</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 text-xs rounded-full">
+                    {school.school_type_name}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {school.area}
+                  </span>
+                </div>
+                {school.url && (
+                  <a 
+                    href={school.url.startsWith('http') ? school.url : `https://${school.url}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-3 inline-block"
+                  >
+                    ウェブサイトを見る
+                  </a>
+                )}
+                <p className="text-gray-700 dark:text-gray-300 mt-3">
+                  {school.description.length > 200 
+                    ? `${school.description.substring(0, 200)}...` 
+                    : school.description}
+                </p>
               </div>
-              {school.url && (
-                <a 
-                  href={school.url.startsWith('http') ? school.url : `https://${school.url}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline mb-3 inline-block"
-                >
-                  ウェブサイトを見る
-                </a>
-              )}
-              <p className="text-gray-700 dark:text-gray-300 mt-3">
-                {school.description.length > 200 
-                  ? `${school.description.substring(0, 200)}...` 
-                  : school.description}
-              </p>
-            </div>
-            <div className="flex-shrink-0">
-              <Link href={`/schools/${school.id}`}>
-                <Button variant="outline">詳細を見る</Button>
-              </Link>
+              <div className="flex-shrink-0">
+                <Link href={`/schools/${school.id}`}>
+                  <Button variant="outline">詳細を見る</Button>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        </FadeIn>
       ))}
       
       {/* ページネーション */}
