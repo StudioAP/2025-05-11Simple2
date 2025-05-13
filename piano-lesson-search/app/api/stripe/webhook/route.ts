@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { headers } from 'next/headers';
 import { createClient } from '@/utils/supabase/server';
 import { stripe } from '@/lib/stripe/client';
 
 // Stripeウェブフックの処理
 export async function POST(request: Request) {
   const body = await request.text();
-  const signature = headers().get('stripe-signature') as string;
+  const signature = request.headers.get('stripe-signature') as string;
 
   // シークレットキーが設定されていない場合はエラー
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
@@ -41,7 +40,7 @@ export async function POST(request: Request) {
   try {
     switch (event.type) {
       // 支払い成功イベント
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const session = event.data.object;
         
         // メタデータからユーザーIDを取得
@@ -54,9 +53,9 @@ export async function POST(request: Request) {
             .upsert({
               user_id: userId,
               stripe_customer_id: session.customer,
-              stripe_subscription_id: session.subscription,
+              stripe_subscription_id: (session as any).subscription as string,
               status: 'active',
-              current_period_end: new Date(session.subscription_data?.subscription_end * 1000).toISOString(),
+              current_period_end: new Date((session as any).subscription?.current_period_end * 1000).toISOString(),
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString(),
             });
@@ -78,15 +77,15 @@ export async function POST(request: Request) {
           }
         }
         break;
+      }
 
       // サブスクリプション更新イベント
-      case 'invoice.payment_succeeded':
+      case 'invoice.payment_succeeded': {
         const invoice = event.data.object;
         
-        // サブスクリプションIDがある場合のみ処理
-        if (invoice.subscription) {
+        if ((invoice as any).subscription) {
           // サブスクリプション情報を取得
-          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
           
           // メタデータからユーザーIDを取得、なければカスタマーIDから検索
           let subUserId = subscription.metadata?.user_id;
@@ -96,7 +95,7 @@ export async function POST(request: Request) {
             const { data: subData } = await supabase
               .from('subscriptions')
               .select('user_id')
-              .eq('stripe_subscription_id', invoice.subscription)
+              .eq('stripe_subscription_id', (invoice as any).subscription)
               .single();
             
             if (subData) {
@@ -110,10 +109,11 @@ export async function POST(request: Request) {
               .from('subscriptions')
               .update({
                 status: subscription.status,
+                // @ts-expect-error - Property 'current_period_end' does not exist on type 'Response<Subscription>' (potential type inference issue)
                 current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
                 updated_at: new Date().toISOString(),
               })
-              .eq('user_id', subUserId);
+              .eq('stripe_subscription_id', (invoice as any).subscription);
 
             if (error) {
               console.error('サブスクリプション情報更新エラー:', error);
@@ -122,17 +122,18 @@ export async function POST(request: Request) {
           }
         }
         break;
+      }
 
       // サブスクリプション失敗イベント
-      case 'invoice.payment_failed':
+      case 'invoice.payment_failed': {
         const failedInvoice = event.data.object;
         
-        if (failedInvoice.subscription) {
+        if ((failedInvoice as any).subscription) {
           // サブスクリプション情報を取得
           const { data: subData } = await supabase
             .from('subscriptions')
             .select('user_id')
-            .eq('stripe_subscription_id', failedInvoice.subscription)
+            .eq('stripe_subscription_id', (failedInvoice as any).subscription)
             .single();
           
           if (subData) {
@@ -143,7 +144,7 @@ export async function POST(request: Request) {
                 status: 'past_due',
                 updated_at: new Date().toISOString(),
               })
-              .eq('user_id', subData.user_id);
+              .eq('stripe_subscription_id', (failedInvoice as any).subscription);
 
             if (error) {
               console.error('サブスクリプションステータス更新エラー:', error);
@@ -152,9 +153,10 @@ export async function POST(request: Request) {
           }
         }
         break;
+      }
 
       // サブスクリプション解約イベント
-      case 'customer.subscription.deleted':
+      case 'customer.subscription.deleted': {
         const deletedSubscription = event.data.object;
         
         // メタデータからユーザーIDを取得、なければサブスクリプションIDから検索
@@ -200,10 +202,12 @@ export async function POST(request: Request) {
           }
         }
         break;
+      }
 
-      default:
+      default: {
         // 処理しないイベントタイプ
         console.log(`未処理のイベントタイプ: ${event.type}`);
+      }
     }
 
     return NextResponse.json({ received: true });

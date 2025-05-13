@@ -17,6 +17,7 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
  */
 export function generateDateRange(startDate: Date, endDate: Date): Date[] {
   const dates: Date[] = [];
+  // eslint-disable-next-line prefer-const
   let currentDate = new Date(startDate);
 
   while (currentDate <= endDate) {

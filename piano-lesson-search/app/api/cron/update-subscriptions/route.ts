@@ -61,6 +61,7 @@ export async function POST(request: Request) {
             .from('subscriptions')
             .update({
               status: stripeSubscription.status,
+              // @ts-expect-error - Type definition mismatch
               current_period_end: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
               updated_at: new Date().toISOString(),
             })

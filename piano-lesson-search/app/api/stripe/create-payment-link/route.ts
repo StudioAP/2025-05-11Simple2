@@ -38,51 +38,38 @@ export async function POST(request: Request) {
       );
     }
 
-    // 教室情報を取得
-    const { data: schools, error: schoolError } = await supabase
-      .from('schools')
-      .select('*')
-      .eq('user_id', userId);
+    // 環境変数からStripe Price IDを取得
+    const priceId = process.env.STRIPE_PRICE_ID;
 
-    if (schoolError) {
+    if (!priceId) {
+      console.error('Stripe Price IDが設定されていません。');
       return NextResponse.json(
-        { error: '教室情報の取得に失敗しました' },
+        { error: 'サーバー設定エラー: Price IDが見つかりません。' },
         { status: 500 }
       );
     }
-
-    // 教室名を取得（なければデフォルト値を使用）
-    const schoolName = schools && schools.length > 0
-      ? schools[0].name
-      : 'ピアノ・リトミック教室';
-
-    // 月額プランのPriceを作成
-    const price = await stripe.prices.create({
-      currency: 'jpy',
-      unit_amount: 500, // 500円
-      recurring: { interval: 'month' },
-      product_data: {
-        name: `${schoolName} 掲載プラン`,
-        description: '教室情報の掲載（月額500円）',
-      },
-    });
 
     // 支払いリンクを作成
     const paymentLink = await stripe.paymentLinks.create({
       line_items: [
         {
-          price: price.id,
+          price: priceId, // 修正：環境変数から取得したPrice IDを使用
           quantity: 1,
         },
       ],
+      subscription_data: { // サブスクリプションにメタデータを設定
+        metadata: {
+          user_id: userId,
+        },
+      },
+      metadata: { // PaymentLinkオブジェクト自体のメタデータ
+        user_id: userId, // 念のため残すが、subscription_data.metadataが重要
+      },
       after_completion: {
         type: 'redirect',
         redirect: {
-          url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/subscription?success=true`,
+          url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard/subscription?success=true&session_id={CHECKOUT_SESSION_ID}`, // session_idを渡してクライアント側で確認できるようにする
         },
-      },
-      metadata: {
-        user_id: userId,
       },
     });
 

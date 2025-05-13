@@ -20,12 +20,19 @@ export function Toaster() {
         return (
           <Toast key={id} {...props}>
             <div className="grid gap-1">
-              {title && <ToastTitle>{title as React.ReactNode}</ToastTitle>}
+              {title && (
+                <ToastTitle>
+                  {String(title)}
+                </ToastTitle>
+              )}
               {description && (
-                <ToastDescription>{description as React.ReactNode}</ToastDescription>
+                <ToastDescription>
+                  {String(description)}
+                </ToastDescription>
               )}
             </div>
-            {action as React.ReactNode}
+            {/* @ts-ignore - Type 'ToastActionElement | undefined' is not assignable to type 'ReactNode' */}
+            {action as any}
             <ToastClose />
           </Toast>
         );

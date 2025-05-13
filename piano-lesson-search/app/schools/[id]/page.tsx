@@ -5,11 +5,11 @@ import { ContactForm } from "@/components/schools/contact-form";
 import { SchoolGallery } from "@/components/schools/school-gallery";
 import { SchoolAnnouncement } from "@/components/schools/school-announcement";
 
-export default async function SchoolDetailPage({
-  params,
-}: {
+interface SchoolDetailPageProps {
   params: { id: string };
-}) {
+}
+
+export default async function SchoolDetailPage({ params }: SchoolDetailPageProps) {
   const supabase = await createClient();
   
   // 教室情報を取得

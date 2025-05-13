@@ -4,50 +4,17 @@ import { SearchFilters } from "@/components/search/search-filters";
 import { PageLoader } from "@/components/ui/loading";
 import { SlideIn } from "@/components/ui/animations";
 
-// 検索ページは常に最新データを取得するため、キャッシュを無効化
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-// メタデータを動的に生成
-export async function generateMetadata({
-  searchParams,
-}: {
+interface SearchPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  // searchParamsを待機
-  const params = await Promise.resolve(searchParams);
-  
-  // キーワードを取得
-  const keywords = [];
-  for (let i = 1; i <= 3; i++) {
-    const keyword = params[`keyword${i}`];
-    if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
-      keywords.push(keyword.trim());
-    }
-  }
-
-  const keywordText = keywords.length > 0 
-    ? keywords.join('、') 
-    : "すべての教室";
-
-  return {
-    title: `${keywordText}の検索結果 | ピアノ・リトミック教室検索`,
-    description: `${keywordText}に関するピアノ・リトミック教室の検索結果です。最適な教室を見つけましょう。`,
-  };
 }
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
-  // searchParamsを待機
-  const params = await Promise.resolve(searchParams);
-  
+export default async function SearchPage({ 
+  searchParams 
+}: SearchPageProps) {
   // キーワードを取得
   const keywords = [];
   for (let i = 1; i <= 3; i++) {
-    const keyword = params[`keyword${i}`];
+    const keyword = searchParams[`keyword${i}`];
     if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
       keywords.push(keyword.trim());
     }

@@ -43,10 +43,7 @@ export function DashboardNav() {
       name: "写真管理",
       href: "/dashboard/photos",
     },
-    {
-      name: "統計情報",
-      href: "/dashboard/statistics",
-    },
+
     {
       name: "プロフィール",
       href: "/dashboard/profile",

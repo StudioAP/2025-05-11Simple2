@@ -44,9 +44,9 @@ import { Loader2, RefreshCw, Search, CheckCircle, XCircle, AlertCircle } from "l
 const getStatusBadge = (status: string) => {
   switch (status) {
     case "active":
-      return { label: "有効", variant: "success" as const };
+      return { label: "有効", variant: "secondary" as const };
     case "past_due":
-      return { label: "支払い遅延", variant: "warning" as const };
+      return { label: "支払い遅延", variant: "default" as const };
     case "canceled":
       return { label: "キャンセル済", variant: "destructive" as const };
     case "unpaid":

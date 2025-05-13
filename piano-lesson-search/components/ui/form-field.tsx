@@ -53,13 +53,13 @@ export function FormField({
       )}
       
       {/* childrenにaria属性を追加 */}
-      {React.isValidElement(children)
+      {React.isValidElement(children) && !Array.isArray(children)
         ? React.cloneElement(children, {
             id,
             "aria-invalid": ariaProps["aria-invalid"],
             "aria-describedby": ariaProps["aria-describedby"],
-            ...children.props,
-          })
+            ...(children.props || {}),
+          } as any)
         : children}
       
       {error && (

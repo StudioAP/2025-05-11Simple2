@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, ReactNode } from "react";
+import { Suspense, lazy, ReactNode, useState, useEffect, useRef } from "react";
 
 interface LazyLoadProps {
   children: ReactNode;
@@ -54,23 +54,4 @@ function LazyLoadInner({ children, threshold }: LazyLoadInnerProps) {
       {isVisible ? children : null}
     </div>
   );
-}
-
-// useStateとuseEffectをインポート
-import { useState, useEffect, useRef } from "react";
-
-// 遅延読み込みするコンポーネントを作成するヘルパー関数
-export function createLazyComponent<T extends object>(
-  importFn: () => Promise<{ default: React.ComponentType<T> }>,
-  fallback?: ReactNode
-) {
-  const LazyComponent = lazy(importFn);
-
-  return function LazyWrappedComponent(props: T) {
-    return (
-      <Suspense fallback={fallback || <div className="min-h-[100px] animate-pulse bg-gray-100 dark:bg-gray-800 rounded-md"></div>}>
-        <LazyComponent {...props} />
-      </Suspense>
-    );
-  };
 }

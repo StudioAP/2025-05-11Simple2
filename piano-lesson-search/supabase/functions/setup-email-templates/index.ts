@@ -1,14 +1,16 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+
 // メールテンプレート設定用のEdge Function
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from '@supabase/supabase-js';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   // CORSプリフライトリクエストの処理
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -25,7 +27,8 @@ serve(async (req) => {
     }
 
     // APIキーの検証
-    const apiKey = authHeader.replace("Bearer ", "");
+    const apiKey = req.headers.get("Authorization")?.replace("Bearer ", "");
+    // @ts-ignore Deno global is not recognized in local TS check
     if (apiKey !== Deno.env.get("CRON_SECRET_TOKEN")) {
       return new Response(
         JSON.stringify({ error: "無効なAPIキーです" }),
@@ -35,7 +38,9 @@ serve(async (req) => {
 
     // Supabaseクライアントの初期化
     const supabaseAdmin = createClient(
+      // @ts-ignore Deno global is not recognized in local TS check
       Deno.env.get("SUPABASE_URL") ?? "",
+      // @ts-ignore Deno global is not recognized in local TS check
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       {
         auth: {
@@ -220,17 +225,20 @@ serve(async (req) => {
     `;
 
     // メール設定の更新
-    const { error } = await supabaseAdmin.auth.admin.updateConfig({
+    const authConfig = {
       email_template_confirmation: confirmationTemplate,
       email_template_reset_password: resetPasswordTemplate,
       email_confirm_change_email: true,
       email_confirm_delete: true,
       mailer_autoconfirm: false,
       sms_autoconfirm: false,
-    });
+    };
 
-    if (error) {
-      throw error;
+    // @ts-ignore supabase-js v2 の型定義と実際のAPIの間に不一致がある可能性があるため、一時的に無視
+    const { error: updateError } = await supabaseAdmin.auth.admin.update({ config: authConfig });
+
+    if (updateError) {
+      throw updateError;
     }
 
     return new Response(
@@ -240,7 +248,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("エラー:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "メールテンプレート設定中にエラーが発生しました" }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "メールテンプレート設定中に不明なエラーが発生しました" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

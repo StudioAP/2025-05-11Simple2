@@ -103,7 +103,7 @@ export function SearchFilters() {
     }
     
     fetchFilterOptions();
-  }, []);
+  }, [supabase]);
 
   // フィルターを適用して検索
   const applyFilters = () => {

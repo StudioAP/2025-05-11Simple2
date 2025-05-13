@@ -3,8 +3,9 @@ import { createClient } from "@/utils/supabase/server";
 import Stripe from "stripe";
 
 // Stripeインスタンスの初期化
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2023-10-16",
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-04-30.basil",
+  typescript: true,
 });
 
 export async function GET(request: NextRequest) {
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     try {
       // Stripeからサブスクリプション情報を取得
-      const subscription = await stripe.subscriptions.retrieve(
+      const subscription: Stripe.Subscription = await stripe.subscriptions.retrieve(
         school.subscription_id
       );
 
@@ -94,13 +95,20 @@ export async function GET(request: NextRequest) {
       }
 
       // 次回の請求日を取得
-      const nextBillingDate = new Date(subscription.current_period_end * 1000);
+      // @ts-expect-error - Stripeの型定義と実際のAPIレスポンスに差異があるため
+      const nextBillingDate = new Date(subscription['current_period_end'] * 1000);
+      const trialEndDate = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null;
+      const currentPeriodStart = new Date(
+        (subscription as any)['current_period_start'] * 1000
+      );
 
       return NextResponse.json({
         status,
         message,
         subscription_id: subscription.id,
-        current_period_start: new Date(subscription.current_period_start * 1000),
+        current_period_start: currentPeriodStart,
         current_period_end: nextBillingDate,
         cancel_at_period_end: subscription.cancel_at_period_end,
       });

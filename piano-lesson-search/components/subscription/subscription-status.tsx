@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Button, useToast } from "@/components/ui";
 import { AlertCircle, CheckCircle, Clock, RefreshCw } from "lucide-react";
 import { PaymentButton } from "./payment-button";
-import { formatStripeError } from "@/lib/stripe/client";
+import { formatStripeError } from "@/lib/stripe/utils";
 
 interface School {
   id: string;

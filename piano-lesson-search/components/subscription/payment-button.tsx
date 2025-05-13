@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui";
-import { formatStripeError } from "@/lib/stripe/client";
+import { formatStripeError } from "@/lib/stripe/utils";
 import { Loader2 } from "lucide-react";
 
 type PaymentButtonProps = {

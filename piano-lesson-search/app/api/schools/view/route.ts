@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { headers } from 'next/headers';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // リクエストボディからスクールIDを取得
     const { schoolId } = await request.json();
@@ -18,7 +17,7 @@ export async function POST(request: Request) {
     const supabase = await createClient();
 
     // IPアドレスとユーザーエージェントを取得
-    const headersList = headers();
+    const headersList = request.headers;
     const ipAddress = headersList.get('x-forwarded-for') || 'unknown';
     const userAgent = headersList.get('user-agent') || 'unknown';
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,12 +26,7 @@ export function PaymentHistory({ userId }: PaymentHistoryProps) {
   const { toast } = useToast();
   const supabase = createClient();
 
-  // 決済履歴を取得
-  useEffect(() => {
-    fetchPaymentHistory();
-  }, [userId]);
-
-  const fetchPaymentHistory = async () => {
+  const fetchPaymentHistory = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -80,7 +75,12 @@ export function PaymentHistory({ userId }: PaymentHistoryProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId, supabase, toast]);
+
+  // 決済履歴を取得
+  useEffect(() => {
+    fetchPaymentHistory();
+  }, [fetchPaymentHistory]);
 
   // 手動更新
   const handleRefresh = async () => {

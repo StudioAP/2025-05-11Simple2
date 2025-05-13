@@ -169,7 +169,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
     }
 
     fetchSchools();
-  }, [keywords, searchParams, PAGE_SIZE]);
+  }, [keywords, searchParams, supabase]);
 
   if (loading) {
     return (

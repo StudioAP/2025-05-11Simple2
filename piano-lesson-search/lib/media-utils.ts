@@ -134,7 +134,12 @@ export async function uploadImage(
         cacheControl: '3600',
         contentType: contentType || file.type,
         upsert: false,
-        ...(onProgress && { onUploadProgress: (progress) => onProgress(progress.percent || 0) })
+        ...(onProgress && {
+          onUploadProgress: (progress: { loaded: number; total: number }) => {
+            const percent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+            onProgress(percent);
+          },
+        }),
       });
     
     if (error) throw error;
