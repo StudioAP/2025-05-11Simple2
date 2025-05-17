@@ -1,5 +1,5 @@
+import React from 'react';
 import { Metadata } from 'next';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'プライバシーポリシー | ピアノ・リトミック教室検索',
