@@ -82,9 +82,6 @@ export function PhotoManager({ schoolId, photos: initialPhotos }: PhotoManagerPr
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
-          onUploadProgress: (progress: { loaded: number; total: number }) => {
-            setUploadProgress(Math.round((progress.loaded / progress.total) * 100));
-          },
         });
 
       if (uploadError) throw uploadError;
