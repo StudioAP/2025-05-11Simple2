@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import ContactForm from '@/components/schools/contact-form';
-import SchoolGallery from "@/components/schools/school-gallery";
-import SchoolAnnouncement from "@/components/schools/school-announcement";
+import { ContactForm } from '@/components/schools/contact-form';
+import { SchoolGallery } from "@/components/schools/school-gallery";
+import { SchoolAnnouncement } from "@/components/schools/school-announcement";
 import { PostgrestError } from "@supabase/supabase-js";
 
 interface SchoolType {
@@ -134,7 +134,7 @@ export default async function SchoolDetailPage({ params }: SchoolDetailPageProps
             <ContactForm 
               schoolId={params.id} 
               schoolName={school.name} 
-              // contactEmail={school.contact_email ?? ''} // 問題特定のため一時的にコメントアウト
+              contactEmail={school.contact_email || ''} 
             />
           </div>
         </div>
