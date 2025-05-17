@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
 // メールテンプレート設定用のEdge Function
-// @ts-ignore
+// @ts-expect-error Denoの型定義はローカルでは認識されない
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from '@supabase/supabase-js';
 
@@ -28,7 +28,7 @@ serve(async (req: Request) => {
 
     // APIキーの検証
     const apiKey = req.headers.get("Authorization")?.replace("Bearer ", "");
-    // @ts-ignore Deno global is not recognized in local TS check
+    // @ts-expect-error Deno global is not recognized in local TS check
     if (apiKey !== Deno.env.get("CRON_SECRET_TOKEN")) {
       return new Response(
         JSON.stringify({ error: "無効なAPIキーです" }),
@@ -38,9 +38,9 @@ serve(async (req: Request) => {
 
     // Supabaseクライアントの初期化
     const supabaseAdmin = createClient(
-      // @ts-ignore Deno global is not recognized in local TS check
+      // @ts-expect-error Deno global is not recognized in local TS check
       Deno.env.get("SUPABASE_URL") ?? "",
-      // @ts-ignore Deno global is not recognized in local TS check
+      // @ts-expect-error Deno global is not recognized in local TS check
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       {
         auth: {
@@ -234,7 +234,7 @@ serve(async (req: Request) => {
       sms_autoconfirm: false,
     };
 
-    // @ts-ignore supabase-js v2 の型定義と実際のAPIの間に不一致がある可能性があるため、一時的に無視
+    // @ts-expect-error supabase-js v2 の型定義と実際のAPIの間に不一致がある可能性があるため、一時的に無視
     const { error: updateError } = await supabaseAdmin.auth.admin.update({ config: authConfig });
 
     if (updateError) {

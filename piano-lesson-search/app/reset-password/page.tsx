@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import ResetPasswordForm from "@/components/auth/reset-password-form";
 
 export default async function ResetPasswordPage() {
   const supabase = await createClient();

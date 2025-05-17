@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, lazy, ReactNode, useState, useEffect, useRef } from "react";
+import { Suspense, ReactNode, useState, useEffect, useRef } from "react";
 
 interface LazyLoadProps {
   children: ReactNode;

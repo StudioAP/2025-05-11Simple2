@@ -71,9 +71,9 @@ export function ProfileForm({ userId, email, initialData }: ProfileFormProps) {
 
       setSuccess("プロフィールが保存されました");
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       console.error("プロフィール保存エラー:", err);
-      setError(err.message || "プロフィールの保存に失敗しました。もう一度お試しください。");
+      setError(err instanceof Error && err.message ? err.message : "プロフィールの保存に失敗しました。もう一度お試しください。");
     } finally {
       setIsSaving(false);
     }

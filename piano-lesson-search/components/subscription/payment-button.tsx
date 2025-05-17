@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui";
+import { useToast } from "@/components/ui/use-toast";
 import { formatStripeError } from "@/lib/stripe/utils";
 import { Loader2 } from "lucide-react";
 
@@ -80,12 +80,12 @@ export function PaymentButton({
         title: "決済ページを開きました",
         description: "新しいタブで決済を完了してください。決済完了後、このページに戻ってきてください。",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("決済リンク生成エラー:", error);
       
       // エラー時のコールバック
       if (onError) {
-        onError(error);
+        onError(error instanceof Error ? error : new Error(String(error)));
       }
       
       toast({

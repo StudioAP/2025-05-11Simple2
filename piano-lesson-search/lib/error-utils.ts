@@ -62,38 +62,49 @@ export function getErrorMessage(errorCode: string): string {
   return ERROR_MESSAGES[errorCode as keyof typeof ERROR_MESSAGES] || ERROR_MESSAGES.default;
 }
 
+// エラーオブジェクトが持ちうるプロパティを考慮した型
+interface LikelyError {
+  message?: string;
+  code?: string | number;
+  status?: number;
+  type?: string;
+}
+
 /**
  * エラーオブジェクトからエラーコードを抽出する
  * @param error エラーオブジェクト
  * @returns エラーコード
  */
-export function extractErrorCode(error: any): string {
+export function extractErrorCode(error: unknown): string {
   if (!error) return 'default';
   
-  // Supabaseエラーの場合
-  if (error.code) {
-    return error.code;
+  if (typeof error !== 'object' || error === null) {
+    return 'default';
+  }
+
+  const err = error as LikelyError;
+
+  if (typeof err.code === 'string') {
+    return err.code;
   }
   
-  // メッセージからエラーコードを抽出
-  if (error.message) {
-    if (error.message.includes('auth/')) {
-      const match = error.message.match(/auth\/[\w-]+/);
+  if (typeof err.message === 'string') {
+    if (err.message.includes('auth/')) {
+      const match = err.message.match(/auth\/[\w-]+/);
       if (match) return match[0];
     }
     
-    if (error.message.includes('network')) {
+    if (err.message.includes('network')) {
       return 'api/network-error';
     }
     
-    if (error.message.includes('timeout')) {
+    if (err.message.includes('timeout')) {
       return 'api/timeout';
     }
   }
   
-  // HTTPステータスコードからエラーコードを推測
-  if (error.status) {
-    switch (error.status) {
+  if (typeof err.status === 'number') {
+    switch (err.status) {
       case 400: return 'api/bad-request';
       case 401: return 'api/unauthorized';
       case 403: return 'api/forbidden';
@@ -112,7 +123,7 @@ export function extractErrorCode(error: any): string {
  * @param error エラーオブジェクト
  * @param customMessage カスタムメッセージ（オプション）
  */
-export function handleError(error: any, customMessage?: string): void {
+export function handleError(error: unknown, customMessage?: string): void {
   console.error('Error occurred:', error);
   
   const errorCode = extractErrorCode(error);
@@ -127,6 +138,9 @@ export function handleError(error: any, customMessage?: string): void {
   }
 }
 
+// エラーの戻り値型を定義
+type ApiError = LikelyError | Error | null;
+
 /**
  * API呼び出しをエラーハンドリング付きで実行する
  * @param apiCall API呼び出し関数
@@ -136,13 +150,36 @@ export function handleError(error: any, customMessage?: string): void {
 export async function safeApiCall<T>(
   apiCall: () => Promise<T>,
   errorMessage?: string
-): Promise<{ data: T | null; error: any }> {
+): Promise<{ data: T | null; error: ApiError }> {
   try {
     const data = await apiCall();
     return { data, error: null };
   } catch (error) {
     handleError(error, errorMessage);
+
+    if (error instanceof Error) {
     return { data: null, error };
+    }
+    // LikelyErrorにキャスト可能か、あるいは最低限のプロパティを持つか確認
+    if (typeof error === 'object' && error !== null) {
+      const likelyError = error as LikelyError;
+      // Check if it has at least one of the LikelyError properties
+      if (
+        typeof likelyError.message === 'string' ||
+        typeof likelyError.code !== 'undefined' ||
+        typeof likelyError.status !== 'undefined' ||
+        typeof likelyError.type === 'string'
+      ) {
+        return { data: null, error: {
+            message: likelyError.message,
+            code: likelyError.code,
+            status: likelyError.status,
+            type: likelyError.type
+        } as LikelyError };
+      }
+    }
+    // If not an Error instance and not shaped like LikelyError, return a new Error
+    return { data: null, error: new Error(typeof error === 'string' ? error : 'An unknown error occurred in safeApiCall') };
   }
 }
 

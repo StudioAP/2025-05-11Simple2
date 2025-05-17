@@ -46,6 +46,10 @@ async function createTestUser() {
     // 既存のユーザーを確認
     const { data, error: authError } = await supabase.auth.admin.listUsers();
     
+    if (authError) {
+      throw new Error(`ユーザーリスト取得エラー: ${authError.message}`);
+    }
+
     let userId;
     let existingUser = null;
     

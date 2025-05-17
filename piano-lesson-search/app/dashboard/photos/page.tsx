@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { PhotoManager } from "@/components/dashboard/photo-manager";
+import PhotoManager from "@/components/dashboard/photo-manager";
 
 export default async function PhotosPage() {
   const supabase = await createClient();

@@ -66,9 +66,9 @@ export function PasswordChangeForm() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (err: any) {
+    } catch (err) {
       console.error("パスワード変更エラー:", err);
-      setError(err.message || "パスワードの変更に失敗しました。もう一度お試しください。");
+      setError(err instanceof Error && err.message ? err.message : "パスワードの変更に失敗しました。もう一度お試しください。");
     } finally {
       setIsSubmitting(false);
     }

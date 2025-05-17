@@ -10,6 +10,24 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { isTestEnvironment } from './env';
 
+// schoolsテーブルの登録・更新用データ型 (仮)
+interface SchoolInput {
+  name: string;
+  description?: string;
+  address?: string; // `area` ではなく `address` が一般的かもしれないので仮に
+  area?: string;    // エリア情報も保持するなら残す
+  type?: string;    // 教室のタイプ (例: ピアノ、リトミック)
+  lesson_types?: string[]; // 提供レッスン種別など
+  target_ages?: string[];  //対象年齢層など
+  phone_number?: string;
+  email?: string;
+  website_url?: string;
+  image_url?: string;
+  is_published?: boolean;
+  // user_id は通常サーバーサイドで設定されるか、認証情報から取得される
+  // created_at, updated_at はDBが自動設定
+}
+
 /**
  * テスト環境用のschoolsテーブル保存処理
  * 全文検索を使わない代替実装を提供します
@@ -21,7 +39,7 @@ import { isTestEnvironment } from './env';
  */
 export const saveSchoolForTest = async (
   supabase: SupabaseClient,
-  data: any,
+  data: SchoolInput,
   id?: string
 ) => {
   try {

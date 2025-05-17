@@ -6,7 +6,7 @@ interface FormMessageProps {
   type?: 'error' | 'success';
 }
 
-const FormMessage: React.FC<FormMessageProps> = ({ message, type }) => {
+export const FormMessage: React.FC<FormMessageProps> = ({ message, type }) => {
   if (!message) return null;
 
   const baseClasses = 'p-3 rounded-md text-sm';
@@ -19,4 +19,4 @@ const FormMessage: React.FC<FormMessageProps> = ({ message, type }) => {
   );
 };
 
-export default FormMessage;
+// export default FormMessage; // Changed to named export

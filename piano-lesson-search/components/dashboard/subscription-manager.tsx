@@ -6,12 +6,12 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-type School = {
-  id: string;
-  user_id: string;
-  name: string;
-  is_published: boolean;
-};
+// type School = { // 未使用のためコメントアウト
+//   id: string;
+//   user_id: string;
+//   name: string;
+//   is_published: boolean;
+// };
 
 type Subscription = {
   id: string;
@@ -24,11 +24,11 @@ type Subscription = {
   updated_at: string;
 };
 
-type SubscriptionManagerProps = {
-  school: School;
-};
+// type SubscriptionManagerProps = { // 未使用のためコメントアウト
+//   // school: School; // 未使用のためコメントアウト
+// };
 
-export function SubscriptionManager({ school }: SubscriptionManagerProps) {
+export function SubscriptionManager() { // 引数を削除
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +83,7 @@ export function SubscriptionManager({ school }: SubscriptionManagerProps) {
       return {
         title: "未登録",
         description: "サブスクリプションが設定されていません。サブスクリプションを開始して教室情報を公開しましょう。",
-        color: "text-gray-600 dark:text-gray-400",
+        // color: "text-gray-600 dark:text-gray-400", // 未使用のためコメントアウト
         badge: "bg-gray-200 text-gray-800",
       };
     }
@@ -93,28 +93,28 @@ export function SubscriptionManager({ school }: SubscriptionManagerProps) {
         return {
           title: "公開中",
           description: "あなたの教室情報は現在公開されています。",
-          color: "text-green-600 dark:text-green-400",
+          // color: "text-green-600 dark:text-green-400", // 未使用のためコメントアウト
           badge: "bg-green-100 text-green-800",
         };
       case "past_due":
         return {
           title: "支払い遅延",
           description: "お支払いに問題が発生しています。決済情報を更新してください。",
-          color: "text-yellow-600 dark:text-yellow-400",
+          // color: "text-yellow-600 dark:text-yellow-400", // 未使用のためコメントアウト
           badge: "bg-yellow-100 text-yellow-800",
         };
       case "canceled":
         return {
           title: "キャンセル済み",
           description: "サブスクリプションはキャンセルされました。再開するには新たにお申し込みください。",
-          color: "text-red-600 dark:text-red-400",
+          // color: "text-red-600 dark:text-red-400", // 未使用のためコメントアウト
           badge: "bg-red-100 text-red-800",
         };
       default:
         return {
           title: "未設定",
           description: "サブスクリプションが設定されていません。",
-          color: "text-gray-600 dark:text-gray-400",
+          // color: "text-gray-600 dark:text-gray-400", // 未使用のためコメントアウト
           badge: "bg-gray-200 text-gray-800",
         };
     }
@@ -160,9 +160,9 @@ export function SubscriptionManager({ school }: SubscriptionManagerProps) {
       
       // 新しいタブで決済ページを開く
       window.open(url, "_blank");
-    } catch (error: any) {
+    } catch (error) {
       console.error("決済リンク生成エラー:", error);
-      alert(error.message || "決済リンクの生成中にエラーが発生しました。もう一度お試しください。");
+      alert(error instanceof Error && error.message ? error.message : "決済リンクの生成中にエラーが発生しました。もう一度お試しください。");
     } finally {
       setIsLoading(false);
     }
@@ -200,15 +200,15 @@ export function SubscriptionManager({ school }: SubscriptionManagerProps) {
 
       // ページをリロード
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       console.error("サブスクリプションキャンセルエラー:", error);
-      alert(error.message || "サブスクリプションのキャンセル中にエラーが発生しました。もう一度お試しください。");
+      alert(error instanceof Error && error.message ? error.message : "サブスクリプションのキャンセル中にエラーが発生しました。もう一度お試しください。");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const { title, description, color, badge } = getStatusDisplay();
+  const { title, description, /*color,*/ badge } = getStatusDisplay(); // color を分割代入から削除
 
   return (
     <div className="space-y-6">

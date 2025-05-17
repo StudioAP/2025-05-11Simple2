@@ -114,11 +114,17 @@ export async function POST(request: Request) {
             status: 'unchanged',
           });
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error(`サブスクリプションID ${subscription.id} の処理エラー:`, error);
         
+        const errorMessage = error instanceof Error ? error.message : 'サブスクリプション情報の確認に失敗しました';
+        let errorCode: string | undefined;
+        if (error && typeof error === 'object' && 'code' in error) {
+          errorCode = String(error.code);
+        }
+
         // サブスクリプションが見つからない場合
-        if (error.code === 'resource_missing') {
+        if (errorCode === 'resource_missing') {
           // サブスクリプション情報をクリア
           const { error: updateError } = await supabase
             .from('subscriptions')
@@ -152,7 +158,7 @@ export async function POST(request: Request) {
           results.push({
             subscription_id: subscription.id,
             status: 'error',
-            message: error.message || 'サブスクリプション情報の確認に失敗しました',
+            message: errorMessage,
           });
         }
       }
@@ -162,10 +168,11 @@ export async function POST(request: Request) {
       processed: results.length,
       results,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('サブスクリプション一括更新エラー:', error);
+    const outerErrorMessage = error instanceof Error ? error.message : 'サブスクリプションの一括更新に失敗しました';
     return NextResponse.json(
-      { error: error.message || 'サブスクリプションの一括更新に失敗しました' },
+      { error: outerErrorMessage },
       { status: 500 }
     );
   }

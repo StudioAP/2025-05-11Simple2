@@ -2,13 +2,18 @@
 
 /**
  * Supabaseにメールテンプレートを適用するスクリプト
- * 実行方法: node scripts/apply-email-templates.js
+ * 実行方法: node scripts/apply-email-templates.mjs
  */
 
-const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs');
-const path = require('path');
-require('dotenv').config();
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
+import 'dotenv/config'; // dotenvの読み込み方を変更
+import { fileURLToPath } from 'url'; // __dirname の代わりに利用
+
+// __dirname と __filename は ESM では直接利用できないため、代替手段を用意
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // 環境変数の確認
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -55,4 +60,4 @@ async function applyEmailTemplates() {
 }
 
 // スクリプトの実行
-applyEmailTemplates();
+applyEmailTemplates(); 

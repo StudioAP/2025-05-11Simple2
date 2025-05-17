@@ -133,6 +133,19 @@ export async function getSchoolViewStats(
   }
 }
 
+// SchoolContact 型の定義 (仮) - 実際のカラムに合わせてください
+interface SchoolContact {
+  id: string;
+  created_at: string; // ISO 8601 string
+  name: string | null;
+  email: string | null;
+  phone?: string | null;
+  message: string | null;
+  school_id: string;
+  responded_at?: string | null; // ISO 8601 string
+  status?: string | null;
+}
+
 /**
  * 教室の問い合わせ統計を取得する
  * @param schoolId 教室ID
@@ -147,7 +160,7 @@ export async function getSchoolContactStats(
 ): Promise<{
   totalContacts: number;
   dailyContacts: { date: string; count: number }[];
-  contactDetails: any[];
+  contactDetails: SchoolContact[];
 }> {
   try {
     // 総問い合わせ数を取得
@@ -161,7 +174,7 @@ export async function getSchoolContactStats(
     if (totalError) throw totalError;
 
     // 問い合わせ詳細を取得
-    const { data: contactDetails, error: detailsError } = await supabase
+    const { data: contactDetailsData, error: detailsError } = await supabase
       .from('school_contacts')
       .select('*')
       .eq('school_id', schoolId)
@@ -177,7 +190,7 @@ export async function getSchoolContactStats(
     // 日別データを集計
     const dailyContacts = dateRange.map(date => {
       const dateStr = formatDate(date);
-      const dayContacts = contactDetails.filter(item => 
+      const dayContacts = (contactDetailsData || []).filter((item: SchoolContact) => 
         formatDate(new Date(item.created_at)) === dateStr
       );
       
@@ -190,7 +203,7 @@ export async function getSchoolContactStats(
     return {
       totalContacts: totalContacts || 0,
       dailyContacts,
-      contactDetails: contactDetails || []
+      contactDetails: (contactDetailsData as SchoolContact[]) || []
     };
   } catch (error) {
     console.error('Error fetching contact stats:', error);

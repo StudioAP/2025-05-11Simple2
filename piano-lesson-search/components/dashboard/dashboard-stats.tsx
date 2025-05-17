@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 type DashboardStatsProps = {
   schoolId: string;
@@ -13,7 +12,7 @@ export function DashboardStats({ schoolId }: DashboardStatsProps) {
     totalInquiries: 0,
   });
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
+  // const supabase = createClient(); // 未使用のためコメントアウト
 
   useEffect(() => {
     async function fetchStats() {

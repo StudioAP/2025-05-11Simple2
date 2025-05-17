@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export function SearchForm() {
+export default function SearchForm() {
   const router = useRouter();
   const [keywords, setKeywords] = useState<string[]>(["", "", ""]);
   const [isSearching, setIsSearching] = useState(false);

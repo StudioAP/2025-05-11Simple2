@@ -6,7 +6,7 @@ import { stripe } from '@/lib/stripe/client';
  * サブスクリプションステータスを確認し、未払いが続いている場合は教室情報を非公開にするAPI
  * このAPIはcronジョブなどから定期的に呼び出すことを想定
  */
-export async function POST(request: Request) {
+export async function POST() {
   try {
     // サービスロールキーを使用してSupabaseクライアントを初期化
     const supabase = await createClient();
@@ -68,12 +68,13 @@ export async function POST(request: Request) {
             });
           }
         }
-      } catch (error: any) {
+      } catch (error) {
         console.error(`サブスクリプションID ${subscription.id} の処理エラー:`, error);
+        const errorMessage = error instanceof Error ? error.message : 'サブスクリプション情報の確認に失敗しました';
         results.push({
           school_id: subscription.schools.id,
           status: 'error',
-          message: error.message || 'サブスクリプション情報の確認に失敗しました',
+          message: errorMessage,
         });
       }
     }
@@ -82,10 +83,11 @@ export async function POST(request: Request) {
       processed: results.length,
       results,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('サブスクリプションステータス確認エラー:', error);
+    const outerErrorMessage = error instanceof Error ? error.message : 'サブスクリプションステータスの確認に失敗しました';
     return NextResponse.json(
-      { error: error.message || 'サブスクリプションステータスの確認に失敗しました' },
+      { error: outerErrorMessage },
       { status: 500 }
     );
   }

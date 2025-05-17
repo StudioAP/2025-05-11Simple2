@@ -1,5 +1,5 @@
 export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import Stripe from "stripe";
 
@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Supabaseクライアントを初期化
     const supabase = await createClient();
@@ -96,13 +96,11 @@ export async function GET(request: NextRequest) {
       }
 
       // 次回の請求日を取得
-      // @ts-expect-error - Stripeの型定義と実際のAPIレスポンスに差異があるため
-      const nextBillingDate = new Date(subscription['current_period_end'] * 1000);
-      const trialEndDate = subscription.trial_end
-        ? new Date(subscription.trial_end * 1000)
-        : null;
+      // @ts-expect-error Property 'current_period_end' might exist on subscription but not be in the type.
+      const nextBillingDate = new Date(subscription.current_period_end * 1000);
       const currentPeriodStart = new Date(
-        (subscription as any)['current_period_start'] * 1000
+        // @ts-expect-error Property 'current_period_start' might exist on subscription but not be in the type.
+        subscription.current_period_start * 1000
       );
 
       return NextResponse.json({
@@ -113,11 +111,16 @@ export async function GET(request: NextRequest) {
         current_period_end: nextBillingDate,
         cancel_at_period_end: subscription.cancel_at_period_end,
       });
-    } catch (stripeError: any) {
+    } catch (stripeError) {
       console.error("Stripeサブスクリプション取得エラー:", stripeError);
+      const stripeErrorMessage = stripeError instanceof Error ? stripeError.message : "サブスクリプション情報の取得に失敗しました";
+      let stripeErrorCode: string | undefined;
+      if (stripeError && typeof stripeError === 'object' && 'code' in stripeError) {
+        stripeErrorCode = String(stripeError.code);
+      }
 
       // サブスクリプションが見つからない場合
-      if (stripeError.code === "resource_missing") {
+      if (stripeErrorCode === "resource_missing") {
         // データベースのサブスクリプション情報をクリア
         const { error: updateError } = await supabase
           .from("schools")
@@ -140,17 +143,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: "サブスクリプション情報の取得に失敗しました",
-          details: stripeError.message,
+          details: stripeErrorMessage,
         },
         { status: 500 }
       );
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("サブスクリプションステータス確認エラー:", error);
+    const errorMessage = error instanceof Error ? error.message : "サブスクリプションステータスの確認中にエラーが発生しました";
     return NextResponse.json(
       {
         error: "サブスクリプションステータスの確認中にエラーが発生しました",
-        details: error.message,
+        details: errorMessage,
       },
       { status: 500 }
     );

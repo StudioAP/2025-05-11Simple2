@@ -31,7 +31,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger, // 未使用のためコメントアウト
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -179,12 +179,12 @@ export function SubscriptionManagement({ initialSubscriptions }: SubscriptionMan
         title: "更新完了",
         description: "サブスクリプション情報を更新しました",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("サブスクリプション情報更新エラー:", error);
       toast({
         variant: "destructive",
         title: "エラー",
-        description: "サブスクリプション情報の更新に失敗しました",
+        description: error instanceof Error ? error.message : "サブスクリプション情報の更新に失敗しました",
       });
     } finally {
       setIsLoading(false);
@@ -227,12 +227,12 @@ export function SubscriptionManagement({ initialSubscriptions }: SubscriptionMan
       });
       
       setIsDialogOpen(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("公開状態更新エラー:", error);
       toast({
         variant: "destructive",
         title: "エラー",
-        description: "公開状態の更新に失敗しました",
+        description: error instanceof Error ? error.message : "公開状態の更新に失敗しました",
       });
     } finally {
       setIsUpdating(false);
@@ -297,12 +297,12 @@ export function SubscriptionManagement({ initialSubscriptions }: SubscriptionMan
         title: "一括更新完了",
         description: `${schoolIds.length}件の教室を非公開に設定しました`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("一括非公開設定エラー:", error);
       toast({
         variant: "destructive",
         title: "エラー",
-        description: "一括非公開設定に失敗しました",
+        description: error instanceof Error ? error.message : "一括非公開設定に失敗しました",
       });
     } finally {
       setIsLoading(false);
@@ -371,7 +371,7 @@ export function SubscriptionManagement({ initialSubscriptions }: SubscriptionMan
         
         <TabsContent value="all" className="mt-4">
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <CardTitle>サブスクリプション一覧</CardTitle>
               <CardDescription>
                 全{filteredSubscriptions.length}件のサブスクリプション
@@ -455,7 +455,7 @@ export function SubscriptionManagement({ initialSubscriptions }: SubscriptionMan
         
         <TabsContent value="overdue" className="mt-4">
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>期限切れサブスクリプション</CardTitle>

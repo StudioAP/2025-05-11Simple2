@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { SearchResults } from "@/components/search/search-results";
+import { SearchResults } from '@/components/search/search-results';
 import { SearchFilters } from "@/components/search/search-filters";
-import { PageLoader } from "@/components/ui/loading";
-import { SlideIn } from "@/components/ui/animations";
+import { SlideIn } from '@/components/ui/animations/slide-in'; 
+import { PageLoader } from '@/components/ui/loading/page-loader';
 
 interface SearchPageProps {
   searchParams: { [key: string]: string | string[] | undefined };

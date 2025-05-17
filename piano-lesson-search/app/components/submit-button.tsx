@@ -10,7 +10,7 @@ interface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement
   children: React.ReactNode;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ pendingText = 'Submitting...', children, ...props }) => {
+export const SubmitButton: React.FC<SubmitButtonProps> = ({ pendingText = 'Submitting...', children, ...props }) => {
   // const { pending } = useFormStatus(); // Uncomment if using experimental form status
   const pending = false; // Placeholder, replace with actual form status if needed
 
@@ -21,4 +21,4 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ pendingText = 'Submitting..
   );
 };
 
-export default SubmitButton;
+// export default SubmitButton; // Changed to named export

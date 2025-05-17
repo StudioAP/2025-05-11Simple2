@@ -1,16 +1,9 @@
-import { FileOptions } from '@supabase/storage-js';
+// import { FileOptions } from '@supabase/storage-js'; // コメントアウト
 
-declare module '@supabase/storage-js' {
-  interface FileOptions {
-    onUploadProgress?: (progress: { loaded: number; total: number }) => void;
-  }
-}
+// declare module '@supabase/storage-js' { // コメントアウト
+//   interface FileOptions { // コメントアウト
+//     onUploadProgress?: (progress: { loaded: number; total: number }) => void; // コメントアウト
+//   } // コメントアウト
+// } // コメントアウト
 
-// React.FormEventの型拡張
-declare global {
-  namespace React {
-    interface FormEvent<T = Element> extends SyntheticEvent<T> {
-      // 既存の定義を保持
-    }
-  }
-}
+// React.FormEventの型拡張は削除されました

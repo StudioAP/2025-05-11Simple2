@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { RefreshCw, Receipt, AlertCircle } from "lucide-react";
+import { RefreshCw, Receipt/*, AlertCircle*/ } from "lucide-react";
 
 interface PaymentHistoryProps {
   userId: string;
@@ -65,12 +65,18 @@ export function PaymentHistory({ userId }: PaymentHistoryProps) {
       
       const { data } = await response.json();
       setPayments(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error("決済履歴取得エラー:", error);
+      let errorMessage = "決済履歴の取得に失敗しました";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+        errorMessage = (error as { message: string }).message;
+      }
       toast({
         variant: "destructive",
         title: "エラー",
-        description: error.message || "決済履歴の取得に失敗しました",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);

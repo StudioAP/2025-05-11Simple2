@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState/*, useEffect*/ } from "react";
 
-export function SkipLink() {
+export default function SkipLink() {
   const [isFocused, setIsFocused] = useState(false);
 
   return (

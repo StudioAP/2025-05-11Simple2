@@ -1,9 +1,13 @@
-import { Header } from "@/components/layout/header";
+import Header from '@/components/layout/header';
 import { ThemeProvider } from "next-themes";
-import { AccessibilityMenu } from "@/components/ui/accessibility-menu";
-import { SkipLink } from "@/components/layout/skip-link";
+import AccessibilityMenu from '@/components/ui/accessibility-menu';
+import SkipLink from "@/components/layout/skip-link";
+import Link from "next/link";
 import "./globals.css";
-import { metadata, geistSans } from "./config";
+import { metadata as appConfigMetadata, geistSans } from "./config";
+
+// config.ts からインポートしたメタデータをエクスポート
+export const metadata = appConfigMetadata;
 
 export default function RootLayout({
   children,
@@ -31,7 +35,21 @@ export default function RootLayout({
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   &copy; {new Date().getFullYear()} ピアノ・リトミック教室検索 All rights reserved.
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+                <div className="flex justify-center space-x-4 mt-3">
+                  <Link 
+                    href="/legal/terms" 
+                    className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
+                  >
+                    利用規約
+                  </Link>
+                  <Link 
+                    href="/legal/privacy" 
+                    className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
+                  >
+                    プライバシーポリシー
+                  </Link>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
                   Powered by{" "}
                   <a
                     href="https://supabase.com"

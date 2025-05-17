@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { UpdatePasswordForm } from "@/components/auth/update-password-form";
+import UpdatePasswordForm from "@/components/auth/update-password-form";
 
 export default async function UpdatePasswordPage() {
   const supabase = await createClient();

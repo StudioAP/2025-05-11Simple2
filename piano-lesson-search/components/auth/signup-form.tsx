@@ -2,22 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle } from "lucide-react";
 
-export function SignupForm() {
-  const router = useRouter();
+export default function SignupForm() {
   const supabase = createClient();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
     fullName: "",
+    agreeToTerms: false,
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,12 +28,22 @@ export function SignupForm() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    setFormData((prev) => ({ ...prev, agreeToTerms: checked }));
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     // バリデーション
+    if (!formData.agreeToTerms) {
+      setError("利用規約とプライバシーポリシーに同意してください");
+      setIsLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("パスワードが一致しません");
       setIsLoading(false);
@@ -77,9 +87,9 @@ export function SignupForm() {
         // 登録成功、メール確認待ち状態に
         setIsSuccess(true);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("登録エラー:", error);
-      if (error.message.includes("already registered")) {
+      if (error instanceof Error && error.message.includes("already registered")) {
         setError("このメールアドレスはすでに登録されています");
       } else {
         setError("登録中にエラーが発生しました。もう一度お試しください。");
@@ -178,6 +188,27 @@ export function SignupForm() {
           required
           disabled={isLoading}
         />
+      </div>
+
+      <div className="flex items-start space-x-2 mt-6">
+        <Checkbox 
+          id="terms" 
+          checked={formData.agreeToTerms}
+          onCheckedChange={handleCheckboxChange}
+          disabled={isLoading}
+        />
+        <Label htmlFor="terms" className="text-sm font-normal leading-tight">
+          <span>
+            <Link href="/legal/terms" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+              利用規約
+            </Link>
+            と
+            <Link href="/legal/privacy" className="text-primary hover:underline ml-1" target="_blank" rel="noopener noreferrer">
+              プライバシーポリシー
+            </Link>
+            に同意します
+          </span>
+        </Label>
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>

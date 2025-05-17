@@ -31,8 +31,7 @@ export function Toaster() {
                 </ToastDescription>
               )}
             </div>
-            {/* @ts-ignore - Type 'ToastActionElement | undefined' is not assignable to type 'ReactNode' */}
-            {action as any}
+            {action as React.ReactElement}
             <ToastClose />
           </Toast>
         );

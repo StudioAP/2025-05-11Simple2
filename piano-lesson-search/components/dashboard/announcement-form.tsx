@@ -181,9 +181,9 @@ export function AnnouncementForm({ schoolId, initialData }: AnnouncementFormProp
 
       setSuccess("お知らせが保存されました");
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       console.error("お知らせ保存エラー:", err);
-      setError(err.message || "お知らせの保存に失敗しました。もう一度お試しください。");
+      setError(err instanceof Error && err.message ? err.message : "お知らせの保存に失敗しました。もう一度お試しください。");
     } finally {
       setIsSaving(false);
     }

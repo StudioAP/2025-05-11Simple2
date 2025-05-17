@@ -76,10 +76,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stripeサブスクリプションキャンセルエラー:', error);
+    const errorMessage = error instanceof Error ? error.message : 'サブスクリプションのキャンセルに失敗しました';
     return NextResponse.json(
-      { error: error.message || 'サブスクリプションのキャンセルに失敗しました' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

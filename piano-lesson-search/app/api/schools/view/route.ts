@@ -40,10 +40,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error('閲覧データ記録エラー:', error);
+    const errorMessage = error instanceof Error ? error.message : '閲覧データの記録に失敗しました';
     return NextResponse.json(
-      { error: error.message || '閲覧データの記録に失敗しました' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

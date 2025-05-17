@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button"; // 未使用のためコメントアウト
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
-export function Header() {
+export default function Header() {
   const pathname = usePathname();
   const supabase = createClient();
   const [isLoggedIn, setIsLoggedIn] = useState(false);

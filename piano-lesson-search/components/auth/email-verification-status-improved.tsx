@@ -73,12 +73,12 @@ export function EmailVerificationStatus() {
           description: `${user.email}宛に確認メールを送信しました。メールボックスをご確認ください。`,
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("認証メール再送信エラー:", error);
       toast({
         variant: "destructive",
         title: "エラーが発生しました",
-        description: error.message || "認証メールの送信に失敗しました。しばらくしてからもう一度お試しください。",
+        description: error instanceof Error ? error.message : "認証メールの送信に失敗しました。しばらくしてからもう一度お試しください。",
       });
     } finally {
       setIsLoading(false);
@@ -106,12 +106,12 @@ export function EmailVerificationStatus() {
           });
         }
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("認証状態更新エラー:", error);
       toast({
         variant: "destructive",
         title: "エラーが発生しました",
-        description: error.message || "認証状態の確認に失敗しました。",
+        description: error instanceof Error ? error.message : "認証状態の確認に失敗しました。",
       });
     } finally {
       setIsLoading(false);

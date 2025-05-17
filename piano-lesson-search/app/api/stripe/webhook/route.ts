@@ -1,3 +1,4 @@
+import Stripe from 'stripe';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { stripe } from '@/lib/stripe/client';
@@ -7,116 +8,113 @@ export async function POST(request: Request) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature') as string;
 
-  // シークレットキーが設定されていない場合はエラー
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
-    console.error('Stripeウェブフックシークレットが設定されていません');
+    console.error('Stripe webhook secret not set');
     return NextResponse.json(
-      { error: 'ウェブフックシークレットが設定されていません' },
+      { error: 'Webhook secret not set' },
       { status: 500 }
     );
   }
 
-  let event;
+  let event: Stripe.Event;
 
   try {
-    // イベントを検証
     event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (err: any) {
-    console.error(`ウェブフック署名検証エラー: ${err.message}`);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : "Unknown error";
+    console.error(`Webhook signature verification failed: ${errorMessage}`);
     return NextResponse.json(
-      { error: `ウェブフック署名検証エラー: ${err.message}` },
+      { error: `Webhook signature verification failed: ${errorMessage}` },
       { status: 400 }
     );
   }
 
-  // Supabaseクライアントを初期化
   const supabase = await createClient();
 
-  // イベントタイプに基づいて処理
   try {
     switch (event.type) {
-      // 支払い成功イベント
       case 'checkout.session.completed': {
-        const session = event.data.object;
-        
-        // メタデータからユーザーIDを取得
+        const session = event.data.object as Stripe.Checkout.Session;
         const userId = session.metadata?.user_id;
-        
-        if (userId) {
-          // サブスクリプション情報を保存
+        const stripeSubscriptionId = session.subscription as string | null; 
+        const stripeCustomerId = session.customer; 
+
+        if (userId && stripeSubscriptionId && stripeCustomerId) {
+          const subscriptionDetails: Stripe.Subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+          
+          const customerIdString = typeof stripeCustomerId === 'string' ? stripeCustomerId : stripeCustomerId.id;
+
           const { error } = await supabase
             .from('subscriptions')
             .upsert({
               user_id: userId,
-              stripe_customer_id: session.customer,
-              stripe_subscription_id: (session as any).subscription as string,
-              status: 'active',
-              current_period_end: new Date((session as any).subscription?.current_period_end * 1000).toISOString(),
-              created_at: new Date().toISOString(),
+              stripe_customer_id: customerIdString,
+              stripe_subscription_id: stripeSubscriptionId,
+              status: subscriptionDetails.status,
+              current_period_end: new Date(subscriptionDetails.items.data[0].current_period_end * 1000).toISOString(),
+              created_at: new Date(session.created * 1000).toISOString(),
               updated_at: new Date().toISOString(),
             });
 
           if (error) {
-            console.error('サブスクリプション情報保存エラー:', error);
+            console.error('Subscription save error:', error);
             throw error;
           }
 
-          // 教室の公開ステータスを更新
           const { error: schoolError } = await supabase
             .from('schools')
             .update({ is_published: true })
             .eq('user_id', userId);
 
           if (schoolError) {
-            console.error('教室公開ステータス更新エラー:', schoolError);
+            console.error('School publish status update error:', schoolError);
             throw schoolError;
           }
         }
         break;
       }
 
-      // サブスクリプション更新イベント
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object;
-        
-        if ((invoice as any).subscription) {
-          // サブスクリプション情報を取得
-          const subscription = await stripe.subscriptions.retrieve((invoice as any).subscription as string);
-          
-          // メタデータからユーザーIDを取得、なければカスタマーIDから検索
-          let subUserId = subscription.metadata?.user_id;
-          
-          if (!subUserId) {
-            // サブスクリプションテーブルからユーザーIDを検索
+        const invoice = event.data.object as Stripe.Invoice;
+        // @ts-expect-error Property 'subscription' might exist on invoice but not be in the type.
+        const subscriptionFromInvoice = invoice.subscription;
+        const stripeSubscriptionId = typeof subscriptionFromInvoice === 'string' 
+          ? subscriptionFromInvoice 
+          : (subscriptionFromInvoice as Stripe.Subscription)?.id;
+
+        if (stripeSubscriptionId) {
+          const subscriptionDetails: Stripe.Subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+          let subUserId = subscriptionDetails.metadata?.user_id;
+
+          if (!subUserId && invoice.customer) {
+            const customerId = typeof invoice.customer === 'string' ? invoice.customer : invoice.customer.id;
             const { data: subData } = await supabase
               .from('subscriptions')
               .select('user_id')
-              .eq('stripe_subscription_id', (invoice as any).subscription)
+              .eq('stripe_subscription_id', stripeSubscriptionId)
+              .eq('stripe_customer_id', customerId)
               .single();
-            
             if (subData) {
               subUserId = subData.user_id;
             }
           }
           
           if (subUserId) {
-            // サブスクリプション情報を更新
             const { error } = await supabase
               .from('subscriptions')
               .update({
-                status: subscription.status,
-                // @ts-expect-error - Property 'current_period_end' does not exist on type 'Response<Subscription>' (potential type inference issue)
-                current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+                status: subscriptionDetails.status,
+                current_period_end: new Date(subscriptionDetails.items.data[0].current_period_end * 1000).toISOString(),
                 updated_at: new Date().toISOString(),
               })
-              .eq('stripe_subscription_id', (invoice as any).subscription);
+              .eq('stripe_subscription_id', stripeSubscriptionId);
 
             if (error) {
-              console.error('サブスクリプション情報更新エラー:', error);
+              console.error('Subscription update error:', error);
               throw error;
             }
           }
@@ -124,97 +122,83 @@ export async function POST(request: Request) {
         break;
       }
 
-      // サブスクリプション失敗イベント
       case 'invoice.payment_failed': {
-        const failedInvoice = event.data.object;
-        
-        if ((failedInvoice as any).subscription) {
-          // サブスクリプション情報を取得
-          const { data: subData } = await supabase
-            .from('subscriptions')
-            .select('user_id')
-            .eq('stripe_subscription_id', (failedInvoice as any).subscription)
-            .single();
-          
-          if (subData) {
-            // サブスクリプションステータスを更新
-            const { error } = await supabase
-              .from('subscriptions')
-              .update({
-                status: 'past_due',
-                updated_at: new Date().toISOString(),
-              })
-              .eq('stripe_subscription_id', (failedInvoice as any).subscription);
+        const failedInvoice = event.data.object as Stripe.Invoice;
+        // @ts-expect-error Property 'subscription' might exist on invoice but not be in the type.
+        const subscriptionFromFailedInvoice = failedInvoice.subscription;
+        const stripeSubscriptionId = typeof subscriptionFromFailedInvoice === 'string'
+          ? subscriptionFromFailedInvoice
+          : (subscriptionFromFailedInvoice as Stripe.Subscription)?.id;
 
-            if (error) {
-              console.error('サブスクリプションステータス更新エラー:', error);
-              throw error;
-            }
+        if (stripeSubscriptionId) {
+          const subscriptionDetails: Stripe.Subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+
+          const { error } = await supabase
+            .from('subscriptions')
+            .update({
+              status: subscriptionDetails.status, 
+              updated_at: new Date().toISOString(),
+            })
+            .eq('stripe_subscription_id', stripeSubscriptionId);
+
+          if (error) {
+            console.error('Subscription status update error (payment_failed):', error);
+            // Potentially throw error depending on business logic for failed payments
           }
         }
         break;
       }
 
-      // サブスクリプション解約イベント
       case 'customer.subscription.deleted': {
-        const deletedSubscription = event.data.object;
-        
-        // メタデータからユーザーIDを取得、なければサブスクリプションIDから検索
+        const deletedSubscription = event.data.object as Stripe.Subscription;
         let deletedUserId = deletedSubscription.metadata?.user_id;
-        
+
         if (!deletedUserId) {
-          // サブスクリプションテーブルからユーザーIDを検索
           const { data: deletedSubData } = await supabase
             .from('subscriptions')
             .select('user_id')
             .eq('stripe_subscription_id', deletedSubscription.id)
             .single();
-          
           if (deletedSubData) {
             deletedUserId = deletedSubData.user_id;
           }
         }
         
         if (deletedUserId) {
-          // サブスクリプション情報を更新
-          const { error } = await supabase
+          const { error: subUpdateError } = await supabase
             .from('subscriptions')
             .update({
-              status: 'canceled',
+              status: deletedSubscription.status, 
               updated_at: new Date().toISOString(),
             })
-            .eq('user_id', deletedUserId);
+            .eq('stripe_subscription_id', deletedSubscription.id);
 
-          if (error) {
-            console.error('サブスクリプション解約エラー:', error);
-            throw error;
+          if (subUpdateError) {
+            console.error('Subscription cancel update error:', subUpdateError);
           }
 
-          // 教室の公開ステータスを非公開に更新
           const { error: schoolError } = await supabase
             .from('schools')
             .update({ is_published: false })
             .eq('user_id', deletedUserId);
 
           if (schoolError) {
-            console.error('教室公開ステータス更新エラー:', schoolError);
-            throw schoolError;
+            console.error('School unpublish status update error:', schoolError);
           }
         }
         break;
       }
 
-      default: {
-        // 処理しないイベントタイプ
-        console.log(`未処理のイベントタイプ: ${event.type}`);
-      }
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
     }
 
     return NextResponse.json({ received: true });
-  } catch (error: any) {
-    console.error(`ウェブフック処理エラー: ${error.message}`);
+  } catch (error) {
+    const webhookHandlerErrorMessage = error instanceof Error ? error.message : "Unknown webhook handler error";
+    console.error(`Webhook handler error: ${webhookHandlerErrorMessage}`);
     return NextResponse.json(
-      { error: `ウェブフック処理エラー: ${error.message}` },
+      { error: `Webhook handler error: ${webhookHandlerErrorMessage}` },
       { status: 500 }
     );
   }

@@ -42,9 +42,9 @@ export function UpdatePasswordForm() {
       // 成功したらダッシュボードにリダイレクト
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       console.error("パスワード更新エラー:", err);
-      setError(err.message || "パスワードの更新に失敗しました。もう一度お試しください。");
+      setError(err instanceof Error && err.message ? err.message : "パスワードの更新に失敗しました。もう一度お試しください。");
     } finally {
       setIsSubmitting(false);
     }

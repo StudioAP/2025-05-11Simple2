@@ -8,24 +8,24 @@ export default async function AdminDashboardPage() {
   const supabase = await createClient();
   
   // サブスクリプション統計情報を取得
-  const { data: subscriptionStats, error: subError } = await supabase
+  const { data: subscriptionStats } = await supabase
     .from("subscriptions")
     .select("status")
     .order("updated_at", { ascending: false });
   
   // 教室情報を取得
-  const { data: schoolStats, error: schoolError } = await supabase
+  const { data: schoolStats } = await supabase
     .from("schools")
     .select("is_published");
   
   // ユーザー数を取得
-  const { count: userCount, error: userError } = await supabase
+  const { count: userCount } = await supabase
     .from("profiles")
     .select("*", { count: "exact", head: true });
   
   // 期限切れサブスクリプション数を取得
   const now = new Date().toISOString();
-  const { count: overdueCount, error: overdueError } = await supabase
+  const { count: overdueCount } = await supabase
     .from("subscriptions")
     .select("*", { count: "exact", head: true })
     .in("status", ["past_due", "unpaid"])

@@ -6,8 +6,8 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
-import { Spinner } from "@/components/ui/loading";
-import { ErrorMessage, PageError } from "@/components/ui/error";
+import { Spinner as LoadingSpinner } from '@/components/ui/loading';
+import { ErrorMessage } from '@/components/ui/error';
 import { FadeIn } from "@/components/ui/animations";
 
 type School = {
@@ -22,18 +22,16 @@ type School = {
 };
 
 // Supabaseから返されるレスポンスの型
-interface SchoolResponse {
-  id: string;
-  name: string;
-  school_type_id: number;
-  school_types: {
-    name: string;
-  };
-  url: string;
-  area: string;
-  description: string;
-  created_at?: string;
-}
+// interface SchoolResponse { // 未使用のためコメントアウト
+//   id: string;
+//   name: string;
+//   school_type_id: number;
+//   school_types: { name: string; }[] | null;
+//   url: string;
+//   area: string;
+//   description: string;
+//   created_at?: string;
+// }
 
 export function SearchResults({ keywords }: { keywords: string[] }) {
   const [schools, setSchools] = useState<School[]>([]);
@@ -148,16 +146,18 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
         }
 
         // 結果を整形
-        const formattedData = data.map((school: any) => ({
+        // data が null の可能性も考慮
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const formattedData = data ? data.map((school: any) => ({
           id: school.id,
           name: school.name,
           school_type_id: school.school_type_id,
-          school_type_name: school.school_types.name,
+          school_type_name: school.school_types && school.school_types.length > 0 ? school.school_types[0].name : "不明",
           url: school.url,
           area: school.area,
           description: school.description,
           created_at: school.created_at
-        }));
+        })) : [];
 
         setSchools(formattedData);
       } catch (err) {
@@ -174,7 +174,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <Spinner size="lg" text="検索中..." />
+        <LoadingSpinner size="lg" text="検索中..." />
       </div>
     );
   }

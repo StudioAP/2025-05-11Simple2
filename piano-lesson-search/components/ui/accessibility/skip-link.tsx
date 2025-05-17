@@ -1,7 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
+// ... HACK: useEffect is not used, but keep it for now
+// import { useState, useEffect } from "react"; 
 
 interface SkipLinkProps {
   targetId: string;

@@ -71,14 +71,15 @@ export function ContactForm({ schoolId, schoolName, recipientEmail }: ContactFor
         title: "送信完了",
         description: "お問い合わせが正常に送信されました。",
       });
-    } catch (err: any) {
+    } catch (err) {
       console.error("問い合わせ送信エラー:", err);
-      setError(err.message || "メール送信中にエラーが発生しました");
+      const errorMessage = err instanceof Error && err.message ? err.message : "メール送信中にエラーが発生しました";
+      setError(errorMessage);
       
       toast({
         variant: "destructive",
         title: "エラーが発生しました",
-        description: err.message || "メール送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
+        description: `${errorMessage} しばらくしてからもう一度お試しください。`,
       });
     } finally {
       setIsLoading(false);

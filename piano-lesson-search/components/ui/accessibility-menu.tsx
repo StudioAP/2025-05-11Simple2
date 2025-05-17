@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
-export function AccessibilityMenu() {
+export default function AccessibilityMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { setTheme, theme } = useTheme();
   const [fontSize, setFontSize] = useState(100);

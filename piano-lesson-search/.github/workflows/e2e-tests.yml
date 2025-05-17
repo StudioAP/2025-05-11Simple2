@@ -1,0 +1,82 @@
+name: E2E Tests
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 毎日午前0時に実行
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'lib/**'
+      - 'utils/**'
+      - 'selenium-e2e/**'
+
+jobs:
+  selenium-tests:
+    name: Selenium E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    services:
+      # Supabaseのローカルインスタンスをテスト用に起動
+      supabase:
+        image: supabase/supabase-local:latest
+        ports:
+          - 54321:54321
+        env:
+          POSTGRES_PASSWORD: postgres
+          SUPABASE_URL: http://localhost:54321
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+      
+      - name: Generate test data
+        run: |
+          npm run setup:test-db
+        env:
+          SUPABASE_URL: http://localhost:54321
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      
+      - name: Start Next.js server
+        run: |
+          npm run dev &
+          sleep 10
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+      
+      - name: Run Selenium tests
+        run: npm run test:selenium
+        env:
+          SELENIUM_TARGET_URL: http://localhost:3000
+          DEBUG_TEST: true
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-test-results
+          path: |
+            test-results/
+            selenium-e2e/test-debug-output/ 

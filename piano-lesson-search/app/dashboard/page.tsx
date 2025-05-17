@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
-import { SubscriptionStatus } from "@/components/dashboard/subscription-status";
-import { EmailVerificationStatus } from "@/components/auth/email-verification-status-improved";
-import { Suspense } from "react";
-import { PageLoader } from "@/components/ui/loading";
-import { FadeIn, SlideIn } from "@/components/ui/animations";
+// import { Suspense } from 'react'; // 未使用のためコメントアウト
+// import SubscriptionStatus from '@/components/dashboard/subscription-status'; // Temporarily commented out
+// import EmailVerificationStatusImproved from '@/components/auth/email-verification-status-improved'; // Temporarily commented out
+// import UserProfileForm from '@/components/forms/user-profile-form'; // Placeholder will be created
+import SlideIn from '@/components/ui/slide-in';
+// import PageLoader from '@/components/ui/page-loader'; // 未使用のためコメントアウト
+// import LoadingSpinner from '@/components/ui/loading'; // 未使用のためコメントアウト
+// import { SlideIn } from '@/components/ui/animations';
+import { FadeIn } from "@/components/ui/animations";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -50,12 +54,13 @@ export default async function DashboardPage() {
         </div>
       </SlideIn>
 
-      {/* メール認証ステータス */}
+      {/* メール認証ステータス - Temporarily commented out
       <SlideIn direction="up" duration={500} delay={100}>
         <Suspense fallback={<PageLoader message="メール認証状況を確認中..." />}>
-          <EmailVerificationStatus />
+          <EmailVerificationStatusImproved />
         </Suspense>
       </SlideIn>
+      */}
 
       {profile && (
         <SlideIn direction="up" duration={500} delay={200}>
@@ -96,7 +101,7 @@ export default async function DashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow duration-300">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
               <h2 className="text-xl font-semibold">教室情報</h2>
-              <SubscriptionStatus status={school.subscription_status} />
+              {/* <SubscriptionStatus status={school.subscription_status} /> */}{/* Temporarily commented out */}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

@@ -116,7 +116,13 @@ export async function searchSchools(
 
     // ビュー数の集計
     const processedData = data.map(school => {
-      const viewCount = school.school_views?.reduce((sum: number, view: any) => sum + view.count, 0) || 0;
+      // school_views の型を定義 (実際にはSupabaseの型生成などから取得するのが望ましい)
+      interface SchoolView {
+        count: number;
+        // 他にも school_views テーブルにカラムがあればここに追加
+      }
+      const schoolViews = school.school_views as SchoolView[] | undefined; // 型アサーション
+      const viewCount = schoolViews?.reduce((sum: number, view: SchoolView) => sum + view.count, 0) || 0;
       
       return {
         ...school,

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function ResetPasswordForm() {
+export default function ResetPasswordForm() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,9 +33,9 @@ export function ResetPasswordForm() {
       }
 
       setSuccess(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error("パスワードリセットエラー:", err);
-      setError(err.message || "パスワードリセットメールの送信に失敗しました。もう一度お試しください。");
+      setError(err instanceof Error && err.message ? err.message : "パスワードリセットメールの送信に失敗しました。もう一度お試しください。");
     } finally {
       setIsSubmitting(false);
     }

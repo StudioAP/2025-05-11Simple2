@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import { DashboardNav } from "@/components/dashboard/dashboard-nav";
-import { EmailVerificationStatus } from "@/components/auth/email-verification-status";
+import DashboardNav from "@/components/dashboard/dashboard-nav";
+import EmailVerificationStatus from "@/components/auth/email-verification-status";
 
 export default async function DashboardLayout({
   children,

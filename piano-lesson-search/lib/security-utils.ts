@@ -146,8 +146,10 @@ export function checkPasswordStrength(password: string): {
 export async function checkRateLimit(
   ip: string,
   endpoint: string,
-  limit: number = 60,
-  windowMs: number = 60000
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _limit: number = 60,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _windowMs: number = 60000
 ): Promise<boolean> {
   // 実際の実装ではRedisなどを使用してレート制限を管理する
   // このサンプルでは常にfalseを返す

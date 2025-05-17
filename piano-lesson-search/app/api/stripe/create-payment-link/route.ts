@@ -75,10 +75,11 @@ export async function POST(request: Request) {
 
     // 支払いリンクURLを返す
     return NextResponse.json({ url: paymentLink.url });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stripe支払いリンク作成エラー:', error);
+    const errorMessage = error instanceof Error ? error.message : '支払いリンクの作成に失敗しました';
     return NextResponse.json(
-      { error: error.message || '支払いリンクの作成に失敗しました' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

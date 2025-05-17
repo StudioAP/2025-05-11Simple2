@@ -100,7 +100,7 @@ test('サブスクリプション登録フローのテスト', async ({ page }) 
         }
       }
     }
-  } catch (e) {
+  } catch (_e) {
     console.log('サブスクリプション開始ボタンが見つかりませんでした。すでにアクティブな可能性があります。');
   }
   
@@ -135,7 +135,7 @@ test('サブスクリプション登録フローのテスト', async ({ page }) 
     try {
       await page.waitForSelector('text=アクティブ', { timeout: 10000 });
       console.log('サブスクリプションがアクティブになりました');
-    } catch (e) {
+    } catch (_e) {
       console.log('アクティブステータスが見つかりませんが、テストを続行します');
     }
     
@@ -144,12 +144,12 @@ test('サブスクリプション登録フローのテスト', async ({ page }) 
       const cancelButton = await page.isVisible('button:has-text("サブスクリプションを解約する")');
       expect(cancelButton).toBeTruthy();
       console.log('キャンセルボタンが見つかりました');
-    } catch (e) {
+    } catch (_e) {
       console.log('キャンセルボタンが見つかりませんが、テストを続行します');
     }
-  } catch (e) {
+  } catch (_e) {
     console.log('新しいタブでStripeの決済ページが開かれませんでした。サブスクリプションがすでにアクティブか、ボタンが正しくクリックされていない可能性があります。');
-    console.log(e);
+    console.log(_e);
     
     // テストを続行するためにテストを成功とみなす
     expect(true).toBeTruthy(); // 常に成功するテスト
@@ -201,7 +201,7 @@ test('サブスクリプションキャンセルフローのテスト', async ({
     try {
       await page.waitForSelector('text=キャンセル', { timeout: 10000 });
       console.log('サブスクリプションのキャンセルが成功しました');
-    } catch (e) {
+    } catch (_e) {
       console.log('キャンセル完了メッセージが表示されませんでしたが、テストを続行します');
     }
   } else {

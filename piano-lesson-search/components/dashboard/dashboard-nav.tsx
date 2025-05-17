@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 
-export function DashboardNav() {
+export default function DashboardNav() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();

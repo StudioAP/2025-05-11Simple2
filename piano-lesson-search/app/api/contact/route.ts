@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+// import { NextResponse } from 'next/server'; // 未使用のためコメントアウト
 
 /**
  * 問い合わせメール送信API

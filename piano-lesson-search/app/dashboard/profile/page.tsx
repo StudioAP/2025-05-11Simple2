@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
-import { ProfileForm } from "@/components/dashboard/profile-form";
-import { PasswordChangeForm } from "@/components/dashboard/password-change-form";
+import ProfileForm from "@/components/dashboard/profile-form";
+import PasswordChangeForm from "@/components/dashboard/password-change-form";
 
 export default async function ProfilePage() {
   const supabase = await createClient();

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
+// import { useRouter } from "next/navigation"; // 未使用のためコメントアウト
+// import { createClient } from "@/utils/supabase/client"; // 未使用のためコメントアウト
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +18,8 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormProps) {
-  const router = useRouter();
-  const supabase = createClient();
+  // const router = useRouter(); // 未使用のためコメントアウト
+  // const supabase = createClient(); // 未使用のためコメントアウト
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
@@ -91,7 +91,7 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
         title: "送信完了",
         description: "お問い合わせが正常に送信されました。",
       });
-    } catch (err: any) {
+    } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -102,7 +102,7 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
       toast({
         variant: "destructive",
         title: "エラーが発生しました",
-        description: err.message || "メール送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
+        description: err instanceof Error && err.message ? err.message : "メール送信中にエラーが発生しました。しばらくしてからもう一度お試しください。",
       });
     } finally {
       setIsSubmitting(false);

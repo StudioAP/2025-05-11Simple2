@@ -11,7 +11,8 @@ export function createLazyComponent<T extends object>(
   return function LazyWrappedComponent(props: T) {
     return (
       <Suspense fallback={fallback || defaultFallback}>
-        <LazyComponent {...(props as any)} />
+        {/* @ts-expect-error T is generally compatible with ComponentType<T> props, but TypeScript's inference can struggle with complex generics in HOCs. */}
+        <LazyComponent {...props} />
       </Suspense>
     );
   };

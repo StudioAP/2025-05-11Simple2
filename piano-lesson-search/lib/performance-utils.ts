@@ -95,7 +95,7 @@ export function measureRenderPerformance<T>(
  * @param func 実行する関数
  * @param wait 待機時間（ミリ秒）
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -117,7 +117,7 @@ export function debounce<T extends (...args: any[]) => any>(
  * @param func 実行する関数
  * @param limit 制限時間（ミリ秒）
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {

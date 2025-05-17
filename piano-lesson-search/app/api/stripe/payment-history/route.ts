@@ -74,10 +74,11 @@ export async function GET(request: Request) {
     }));
 
     return NextResponse.json({ data: paymentHistory });
-  } catch (error: any) {
+  } catch (error) {
     console.error('決済履歴取得エラー:', error);
+    const errorMessage = error instanceof Error ? error.message : '決済履歴の取得に失敗しました';
     return NextResponse.json(
-      { error: error.message || '決済履歴の取得に失敗しました' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

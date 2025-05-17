@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -55,11 +55,11 @@ export function FormField({
       {/* childrenにaria属性を追加 */}
       {React.isValidElement(children) && !Array.isArray(children)
         ? React.cloneElement(children, {
+            ...children.props,
             id,
             "aria-invalid": ariaProps["aria-invalid"],
             "aria-describedby": ariaProps["aria-describedby"],
-            ...(children.props || {}),
-          } as any)
+          })
         : children}
       
       {error && (

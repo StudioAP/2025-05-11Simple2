@@ -102,10 +102,14 @@ test('サブスクリプションを申し込めること', async ({ page }) => 
       // サブスクリプションがアクティブになっていることを確認
       await expect(page.getByText('アクティブ')).toBeVisible({ timeout: 10000 });
       console.log('サブスクリプションがアクティブになりました');
-    } catch (e) {
-      console.error('Stripe決済処理中にエラーが発生しました:', e);
+    } catch (_e) {
+      // エラーが発生してもテストを継続（ただし、失敗は記録される）
+      console.error(
+        'Stripe決済処理中にエラーが発生しました:',
+        _e
+      );
       await page.screenshot({ path: 'error-stripe-payment.png' });
-      throw e;
+      throw _e;
     }
   } else {
     console.log('サブスクリプション開始ボタンが見つかりませんでした');
@@ -159,7 +163,7 @@ test('サブスクリプションをキャンセルできること', async ({ pa
       console.log('キャンセルボタンが見つかりませんでした');
       test.fail();
     }
-  } catch (e) {
+  } catch (_e) {
     console.log('サブスクリプションがアクティブではないため、キャンセルテストをスキップします');
     test.skip();
   }

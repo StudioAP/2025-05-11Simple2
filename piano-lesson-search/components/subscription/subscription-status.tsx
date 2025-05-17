@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, Button, useToast } from "@/components/ui";
-import { AlertCircle, CheckCircle, Clock, RefreshCw } from "lucide-react";
+import { AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { PaymentButton } from "./payment-button";
 import { formatStripeError } from "@/lib/stripe/utils";
 
@@ -185,7 +185,7 @@ export function SubscriptionStatus({ userId, school, onRefresh }: SubscriptionSt
         title: "キャンセル完了",
         description: "サブスクリプションは期限日をもって終了します",
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error("サブスクリプションキャンセルエラー:", error);
       toast({
         variant: "destructive",

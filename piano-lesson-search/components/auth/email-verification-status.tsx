@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Mail } from "lucide-react";
 
-export function EmailVerificationStatus() {
+export default function EmailVerificationStatus() {
   const [isEmailVerified, setIsEmailVerified] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);

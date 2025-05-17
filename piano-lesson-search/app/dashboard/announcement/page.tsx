@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { AnnouncementForm } from "@/components/dashboard/announcement-form";
+import AnnouncementForm from '@/components/dashboard/announcement-form';
 
 export default async function AnnouncementPage() {
   const supabase = await createClient();

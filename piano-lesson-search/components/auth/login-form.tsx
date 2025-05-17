@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function LoginForm() {
+export default function LoginForm() {
   const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState("");
@@ -33,10 +33,10 @@ export function LoginForm() {
 
       router.push("/dashboard");
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       console.error("ログインエラー:", error);
       setError(
-        error.message === "Invalid login credentials"
+        error instanceof Error && error.message === "Invalid login credentials"
           ? "メールアドレスまたはパスワードが正しくありません"
           : "ログイン中にエラーが発生しました。もう一度お試しください。"
       );
