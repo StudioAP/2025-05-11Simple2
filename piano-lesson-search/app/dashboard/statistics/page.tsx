@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
-import StatisticsOverview from "@/components/dashboard/statistics-overview";
-import DailyViewsChart from "@/components/dashboard/daily-views-chart";
-import ContactList from "@/components/dashboard/contact-list";
+import { StatisticsOverview } from "@/components/dashboard/statistics-overview";
+import { DailyViewsChart } from "@/components/dashboard/daily-views-chart";
+import { ContactList } from "@/components/dashboard/contact-list";
 
 export default async function StatisticsPage() {
   const supabase = await createClient();
