@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 // import SubscriptionStatus from '@/components/dashboard/subscription-status'; // Temporarily commented out
 // import EmailVerificationStatusImproved from '@/components/auth/email-verification-status-improved'; // Temporarily commented out
 // import UserProfileForm from '@/components/forms/user-profile-form'; // Placeholder will be created
-import SlideIn from '@/components/ui/slide-in';
+import { SlideIn } from '@/components/ui/animations';
 // import PageLoader from '@/components/ui/page-loader'; // 未使用のためコメントアウト
 // import LoadingSpinner from '@/components/ui/loading'; // 未使用のためコメントアウト
 // import { SlideIn } from '@/components/ui/animations';
