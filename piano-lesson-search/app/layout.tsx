@@ -1,13 +1,18 @@
-import Header from '@/components/layout/header';
-import { ThemeProvider } from "@/components/theme-provider";
-import AccessibilityMenu from '@/components/ui/accessibility-menu';
+import { Providers } from "@/components/providers";
+// import Header from '@/components/layout/header';
+// import AccessibilityMenu from '@/components/ui/accessibility-menu';
 import SkipLink from "@/components/layout/skip-link";
 import Link from "next/link";
 import "./globals.css";
 import { metadata as appConfigMetadata, geistSans } from "./config";
+import dynamic from 'next/dynamic';
 
 // config.ts からインポートしたメタデータをエクスポート
 export const metadata = appConfigMetadata;
+
+// 動的インポート
+const Header = dynamic(() => import('@/components/layout/header'), { ssr: false });
+const AccessibilityMenu = dynamic(() => import('@/components/ui/accessibility-menu'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -17,12 +22,7 @@ export default function RootLayout({
   return (
     <html lang="ja" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <Providers>
           <div className="min-h-screen flex flex-col">
             <SkipLink />
             <Header />
@@ -63,7 +63,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
