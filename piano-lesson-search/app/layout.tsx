@@ -1,7 +1,5 @@
-"use client";
-
 import Header from '@/components/layout/header';
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider } from "@/components/theme-provider";
 import AccessibilityMenu from '@/components/ui/accessibility-menu';
 import SkipLink from "@/components/layout/skip-link";
 import Link from "next/link";
