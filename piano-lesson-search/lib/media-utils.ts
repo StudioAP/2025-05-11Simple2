@@ -19,7 +19,6 @@ export interface ImageUploadOptions {
   folder?: string;
   fileName?: string;
   contentType?: string;
-  onProgress?: (progress: number) => void;
 }
 
 /**
@@ -110,7 +109,6 @@ export async function uploadImage(
       folder = 'school_images',
       fileName,
       contentType,
-      onProgress
     } = options;
     
     // ファイルサイズをチェック
