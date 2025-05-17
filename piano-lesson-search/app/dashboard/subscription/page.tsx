@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
-import SubscriptionStatus from "@/components/subscription/subscription-status";
-import PaymentHistory from "@/components/subscription/payment-history";
+import { SubscriptionStatus } from "@/components/subscription/subscription-status";
+import { PaymentHistory } from "@/components/subscription/payment-history";
 import { Toaster } from "@/components/ui/toaster";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
