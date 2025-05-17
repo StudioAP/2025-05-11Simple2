@@ -3,8 +3,8 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation'; // For App Router
 // import { createSupabaseBrowserClient } from '@/utils/supabase/client';
-import LoadingSpinner from '@/components/ui/loading';
-import ErrorMessage from '@/components/ui/error';
+import { Spinner as LoadingSpinner } from '@/components/ui/loading';
+import { ErrorMessage } from '@/components/ui/error';
 // import { FadeIn } from '@/components/ui/animations'; // Assuming animations exist
 
 interface SchoolResult {

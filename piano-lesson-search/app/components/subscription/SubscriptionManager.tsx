@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 // import { createSupabaseBrowserClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import LoadingSpinner from '@/components/ui/loading';
+import { Spinner as LoadingSpinner } from '@/components/ui/loading';
 
 interface Subscription {
   id: string;
