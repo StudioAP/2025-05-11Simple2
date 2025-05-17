@@ -1,3 +1,5 @@
+"use client";
+
 import Header from '@/components/layout/header';
 import { ThemeProvider } from "next-themes";
 import AccessibilityMenu from '@/components/ui/accessibility-menu';
