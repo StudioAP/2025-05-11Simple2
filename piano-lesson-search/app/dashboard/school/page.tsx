@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import SchoolForm from "@/components/dashboard/school-form";
+import { SchoolForm } from "@/components/dashboard/school-form";
 
 export default async function SchoolEditPage() {
   const supabase = await createClient();

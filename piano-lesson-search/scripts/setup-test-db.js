@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { createClient } = require('@supabase/supabase-js');
-const dotenv = require('dotenv');
+/* eslint-disable @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports */
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
 // 環境変数のロード
 dotenv.config();
