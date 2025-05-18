@@ -1,0 +1,12 @@
+[SEVERE] [2025-05-18T12:02:53.288Z] https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js 0:4044 "Failed to fetch RSC payload for https://piano-rythmique.netlify.app/legal/privacy. Falling back to browser navigation." TypeError: Failed to fetch
+    at s (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:45418)
+    at https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:58944
+    at Object.u [as task] (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:31835)
+    at c.s (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:32540)
+    at c.enqueue (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:31965)
+    at s (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:58907)
+    at i (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:58447)
+    at a (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:65236)
+    at f (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:1:75080)
+    at Object.action (https://piano-rythmique.netlify.app/_next/static/chunks/2117-deaac5b1d32c7056.js:2:7082)
+[SEVERE] [2025-05-18T12:02:53.290Z] https://piano-rythmique.netlify.app/dashboard/schools - Failed to load resource: the server responded with a status of 404 ()

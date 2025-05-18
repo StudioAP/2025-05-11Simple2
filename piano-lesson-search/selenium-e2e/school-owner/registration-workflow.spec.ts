@@ -1,4 +1,4 @@
-import { By, WebDriver } from 'selenium-webdriver';
+import { By, WebDriver, until } from 'selenium-webdriver';
 import { setupDriver, quitDriver } from '../utils/driver-setup';
 import { logDebuggingInfo } from '../utils/helpers';
 import {
@@ -35,8 +35,16 @@ const testCredentials = {
   }
 };
 
+// サービス実メールアドレス (必要な場合に使用)
+const SERVICE_EMAIL = 'piano-rythmique.find@gmail.com';
+
 describe('教室運営者向け登録・設定ワークフロー', () => {
   let driver: WebDriver | null = null;
+  let scenario1SignupSuccess = false;
+  let scenario1LoginSuccess = false;
+  let scenario1SchoolInfoSuccess = false;
+  let scenario3SignupSuccess = false;
+
   // テスト用の教室運営者データを生成（複数シナリオ用）
   const testOwner1 = generateTestSchoolOwner();
   const testOwner2 = generateTestSchoolOwner();
@@ -62,19 +70,18 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // 完全な成功でなくても続行できるように変更
-        expect(result).not.toBeUndefined();
-        // サインアップが失敗した場合は警告として記録するだけで、テストは続行
-        if (!result) {
-          console.warn('サインアップは完了しませんでしたが、続行します');
-        }
+        expect(result).toBe(true); // サインアップは成功する必要がある
+        scenario1SignupSuccess = true;
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
-        throw error;
+        throw error; // エラーをスローしてテストを失敗させる
       }
     }, 60000);
 
     test('1.2 ログインしてダッシュボードにアクセスできること', async () => {
+      if (!scenario1SignupSuccess) {
+        throw new Error('前提となるサインアップテストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
       const testName = 'scenario1_login';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
@@ -86,37 +93,32 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // ログイン状態を確認（完全成功でなくても続行）
-        expect(result).not.toBeUndefined();
-        
-        if (!result) {
-          console.warn('ログインは完了しませんでしたが、続行します');
-          return; // この部分のチェックはスキップ
-        }
+        expect(result).toBe(true); // ログインは成功する必要がある
+        scenario1LoginSuccess = true;
         
         // ダッシュボード内容の確認（ログイン成功時のみ）
-        try {
-          const bodyText = await driver.findElement(By.tagName('body')).getText();
-          const hasDashboardContent = 
-            bodyText.includes('ダッシュボード') || 
-            bodyText.includes('Dashboard') || 
-            bodyText.includes('教室情報');
-          
-          // 厳密な検証は行わず、警告として記録するだけに変更
-          if (!hasDashboardContent) {
-            console.warn('ダッシュボードの内容が確認できませんでした。UI変更の可能性があります。');
-          }
-        } catch (pageError) {
-          console.warn('ページの内容確認中にエラーが発生しましたが、続行します:', pageError);
+        const bodyText = await (driver.findElement(By.css('body')) as any).getText();
+        const hasDashboardContent = 
+          bodyText.includes('ダッシュボード') || 
+          bodyText.includes('Dashboard') || 
+          bodyText.includes('教室情報');
+        
+        if (!hasDashboardContent) {
+          // ダッシュボードの内容確認は、UIの変更に影響されやすいため、
+          // 失敗した場合は警告に留め、テスト自体は失敗としない。
+          // ただし、これがクリティカルな検証であればエラーにすべき。
+          console.warn('ダッシュボードの内容が期待通りではありませんでした。UI変更の可能性があります。');
         }
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
-        // エラーをスローせず警告として扱う
-        console.warn('ログインテスト中にエラーが発生しましたが、続行します:', error);
+        throw error; // エラーをスローしてテストを失敗させる
       }
     }, 60000);
 
     test('1.3 教室情報を登録できること', async () => {
+      if (!scenario1LoginSuccess) {
+        throw new Error('前提となるログインテストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
       const testName = 'scenario1_school_info';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
@@ -134,11 +136,8 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // 教室情報登録が完全に成功しなくても続行
-        expect(result).not.toBeUndefined();
-        if (!result) {
-          console.warn('教室情報の登録は完了しませんでしたが、続行します');
-        }
+        expect(result).toBe(true); // 教室情報登録は成功する必要がある
+        scenario1SchoolInfoSuccess = true;
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
         throw error;
@@ -146,6 +145,9 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
     }, 60000);
 
     test('1.4 サブスクリプションページにアクセスできること', async () => {
+      if (!scenario1LoginSuccess) { // ログインが成功していればアクセス試行可能
+        throw new Error('前提となるログインテストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
       const testName = 'scenario1_subscription';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
@@ -156,21 +158,16 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // サブスクリプションページへのアクセスが失敗しても続行
-        expect(result).not.toBeUndefined();
-        if (!result) {
-          console.warn('サブスクリプションページへのアクセスは完了しませんでしたが、続行します');
-          return; // この部分のチェックはスキップ
-        }
+        expect(result).toBe(true); // サブスクリプションページへのアクセスは成功する必要がある
         
         // ページ内容の確認（アクセス成功時のみ）
-        const bodyText = await driver.findElement(By.tagName('body')).getText();
+        const bodyText = await (driver.findElement(By.css('body')) as any).getText();
         const hasSubscriptionContent = 
           bodyText.includes('サブスクリプション') || 
           bodyText.includes('プラン') || 
           bodyText.includes('支払い');
         
-        expect(hasSubscriptionContent).toBe(true);
+        expect(hasSubscriptionContent).toBe(true); // ページ内容も期待通りである必要がある
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
         throw error;
@@ -178,6 +175,9 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
     }, 60000);
 
     test('1.5 教室の公開設定ができること', async () => {
+      if (!scenario1SchoolInfoSuccess) { // 教室情報が登録されていれば試行可能
+        throw new Error('前提となる教室情報登録テストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
       const testName = 'scenario1_publish';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
@@ -188,36 +188,109 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // 実行できたかどうかのみ確認
-        expect(result).not.toBeUndefined();
-        if (!result) {
-          console.warn('公開設定の操作ができませんでしたが、テストを続行します');
-        }
+        expect(result).toBe(true); // 公開設定の操作は成功する必要がある
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
-        // このテストでエラーが出ても、全体のテストは続行
-        console.error('公開設定テスト中にエラーが発生しました:', error);
+        throw error;
       }
     }, 60000);
   });
 
   describe('シナリオ2: 入力検証', () => {
+    // このテストは未実装のままなので、一旦 skip するか、具体的な実装を行う
     test('2.1 無効な情報で教室情報を登録しようとするとエラーが表示されること', async () => {
+      if (!scenario1LoginSuccess) {
+        throw new Error('前提となるログインテストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
+      
       const testName = 'scenario2_validation';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
-      
-      // このテストでは、単にテストがフレームワークレベルで正常に動作するかを確認します
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://piano-rythmique.netlify.app'; // auto-test-console.ts から拝借
+
       try {
-        console.log('無効入力テスト - 検証のみを行い、実際のUI操作はスキップします');
+        // 教室情報登録ページへ移動
+        await driver.get(`${baseUrl}/dashboard`);
+        // 確実にページ遷移が行われるように少し待機
+        await driver.sleep(1000); 
+
+        // 「教室情報登録」ボタンまたはリンクを探してクリック
+        // 既に登録済みの場合は「編集」などのボタンになる可能性も考慮
+        let registerOrEditButton;
+        try {
+          registerOrEditButton = await driver.findElement(By.xpath('//a[contains(text(), "教室情報登録")]'));
+        } catch (e) {
+          try {
+            registerOrEditButton = await driver.findElement(By.xpath('//button[contains(text(), "教室情報を編集")]'));
+          } catch (e2) {
+            // それでも見つからなければ、現在のページが既にフォームである可能性も考慮し、要素が見つからなくても続行する
+            console.warn('教室情報登録/編集ボタンが見つかりませんでしたが、テストを続行します。');
+          }
+        }
+        if (registerOrEditButton) {
+          await registerOrEditButton.click();
+          await driver.wait(until.elementLocated(By.id('school-name')), 10000); // フォームが表示されるまで待機
+        } else {
+           // 既にフォーム画面にいるか確認
+           const schoolNameFieldExists = await driver.findElements(By.id('school-name'));
+           if (schoolNameFieldExists.length === 0) {
+             throw new Error('教室情報登録フォームに遷移できませんでした。');
+           }
+        }
+
+        // --- 検証ケース1: 教室名が空 ---
+        console.log('入力検証テスト: 教室名が空の場合');
+        // 各フィールドを取得
+        const schoolNameField = await driver.findElement(By.id('school-name'));
+        const schoolAreaField = await driver.findElement(By.id('school-area'));
+        const schoolDescField = await driver.findElement(By.id('school-description'));
+        const contactEmailField = await driver.findElement(By.id('contact-email'));
+        const saveButton = await driver.findElement(By.xpath('//button[contains(text(), "保存")]'));
+
+        // 教室名以外を入力
+        await (schoolNameField as any).clear(); // anyキャストでclear()のエラーを回避
+        await (schoolAreaField as any).clear();
+        await schoolAreaField.sendKeys('テスト地域（検証用）');
+        await (schoolDescField as any).clear();
+        await schoolDescField.sendKeys('これは入力検証テストです。');
+        await (contactEmailField as any).clear();
+        await contactEmailField.sendKeys(generateTestEmail('validation_test1'));
+
+        await saveButton.click();
+        await driver.sleep(500); // エラーメッセージ表示のための待機
+
+        // 教室名に関するエラーメッセージが表示されることを確認 (具体的なメッセージとセレクタは要調整)
+        // 例: <div class="error-message">教室名は必須です</div>
+        // ここでは、ページ内に "必須" や "入力してください" というテキストが含まれるかで簡易的に判定
+        let pageSource = await (driver.findElement(By.css('body')) as any).getText();
+        expect(pageSource.includes('必須') || pageSource.includes('入力してください')).toBe(true); 
+        // TODO: より具体的なエラーセレクタとメッセージで検証することが望ましい
+
+        // --- 検証ケース2: メールアドレスの形式が無効 ---
+        console.log('入力検証テスト: メールアドレスの形式が無効な場合');
+        // 再度フォームページにいることを確認（または再遷移）
+        // 上記の保存失敗後、同じページに留まっていると仮定
         
-        // 無効なデータで失敗するはずの処理をシミュレート
-        // 実際にUI操作は行わず、テストの成功を記録するだけ
-        
-        // ここでバリデーションのテストを行いたい場合は、あとで追加実装
+        // 教室名は有効な値を入力
+        await (schoolNameField as any).clear();
+        await schoolNameField.sendKeys('テスト教室（検証用）');
+        // メールアドレスに無効な値を入力
+        await (contactEmailField as any).clear();
+        await contactEmailField.sendKeys('invalid-email-format');
+        // 他のフィールドは先程の値のままでOK
+
+        await saveButton.click(); // 再度保存ボタンをクリック
+        await driver.sleep(500);
+
+        // メールアドレスに関するエラーメッセージが表示されることを確認 (具体的なメッセージとセレクタは要調整)
+        pageSource = await (driver.findElement(By.css('body')) as any).getText();
+        expect(pageSource.includes('有効なメールアドレス') || pageSource.includes('正しい形式')).toBe(true);
+        // TODO: より具体的なエラーセレクタとメッセージで検証することが望ましい
+
+        console.log('入力検証テスト完了');
       } catch (error) {
-        // エラーも記録せず、テストを成功させる
-        console.warn('入力検証テストはスキップされました');
+        if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
+        throw error;
       }
     }, 60000);
   });
@@ -235,11 +308,8 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
           { testName, currentTestFullName: currentTestName }
         );
         
-        // 完全な成功でなくても続行できるように変更
-        expect(result).not.toBeUndefined();
-        if (!result) {
-          console.warn('2人目のユーザーのサインアップは完了しませんでしたが、続行します');
-        }
+        expect(result).toBe(true); // 2人目のユーザーのサインアップも成功する必要がある
+        scenario3SignupSuccess = true;
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
         throw error;
@@ -247,6 +317,9 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
     }, 60000);
 
     test('3.2 2つ目の教室情報を登録できること', async () => {
+      if (!scenario3SignupSuccess) {
+        throw new Error('前提となる別アカウントでのサインアップテストが失敗したため、このテストは実行できません。');
+      }
       if (!driver) throw new Error('WebDriver not initialized');
       const testName = 'scenario3_second_school';
       const currentTestName = expect.getState().currentTestName || 'unknown_test';
@@ -259,16 +332,12 @@ describe('教室運営者向け登録・設定ワークフロー', () => {
             type: 'リトミック',
             description: '子どもの感性と音楽的才能を育てるリトミックレッスンを提供しています。楽しい活動を通じて、リズム感、表現力、集中力などを養います。少人数制で、それぞれの子どもの成長に合わせたレッスンを心がけています。',
             address: '東京都渋谷区神宮前4-5-6',
-            email: 'info@gekkou-rhythm.example.com'
+            email: SERVICE_EMAIL  // サービスの実メールアドレスに更新
           },
           { testName, currentTestFullName: currentTestName }
         );
         
-        // 教室情報登録が完全に成功しなくても続行
-        expect(result).not.toBeUndefined();
-        if (!result) {
-          console.warn('2つ目の教室情報の登録は完了しませんでしたが、テストを完了します');
-        }
+        expect(result).toBe(true); // 教室情報登録は成功する必要がある
       } catch (error) {
         if (driver) await logDebuggingInfo(driver, `${currentTestName}_${testName}`);
         console.warn('2つ目の教室登録テスト中にエラーが発生しましたが、テストを完了します:', error);
