@@ -1,0 +1,14 @@
+# ピアノ・リトミック教室検索サイト robots.txt
+User-agent: *
+Allow: /
+
+# 検索エンジンにインデックスしてほしくないパス
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /login
+Disallow: /signup
+Disallow: /reset-password
+
+# サイトマップ
+Sitemap: https://piano-lesson-search.example.com/sitemap.xml

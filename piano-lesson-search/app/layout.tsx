@@ -13,6 +13,7 @@ export const metadata = appConfigMetadata;
 // 動的インポート
 const Header = dynamic(() => import('@/components/layout/header'), { ssr: false });
 const AccessibilityMenu = dynamic(() => import('@/components/ui/accessibility-menu'), { ssr: false });
+const BackToTopButton = dynamic(() => import('../components/layout/back-to-top-button'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -48,6 +49,9 @@ export default function RootLayout({
                   >
                     プライバシーポリシー
                   </Link>
+                </div>
+                <div className="mt-4">
+                  <BackToTopButton />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
                   Powered by{" "}
