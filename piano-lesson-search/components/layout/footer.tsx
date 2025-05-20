@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import Link from "next/link";
 
 export default function Footer() {
+  const scrollToTop = useCallback(() => window.scrollTo({ top: 0, behavior: 'smooth' }), []);
   return (
     <footer className="border-t border-gray-200 dark:border-gray-800 py-6 md:py-8">
       <div className="container mx-auto px-4 text-center">
@@ -30,7 +31,7 @@ export default function Footer() {
         </div>
         <div className="mt-4">
           <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={scrollToTop}
             className="inline-flex items-center text-xs text-gray-500 dark:text-gray-500 hover:text-primary"
             aria-label="ページトップへ戻る"
           >
