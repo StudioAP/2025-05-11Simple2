@@ -17,6 +17,7 @@ export function AccessibleImage({
   const [error, setError] = useState(false);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Image failed to load: ${props.src}`);
     setError(true);
     if (onError) {
       onError(e);

@@ -269,3 +269,30 @@ export function calculateAspectRatio(width: number, height: number): string {
   const divisor = gcd(width, height);
   return `${width / divisor}:${height / divisor}`;
 }
+
+/**
+ * Supabase Storage URLのエラーハンドリング付きURL生成
+ * @param bucket バケット名
+ * @param path 画像パス
+ * @returns URLまたはnull
+ */
+export function getStorageImageUrl(bucket: string, path: string): string | null {
+  try {
+    if (!path) return null;
+    
+    if (path.startsWith('http')) {
+      return path;
+    }
+    
+    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!baseUrl) {
+      console.error('Supabase URL is not defined');
+      return null;
+    }
+    
+    return `${baseUrl}/storage/v1/object/public/${bucket}/${path}`;
+  } catch (error) {
+    console.error('Error generating storage URL:', error);
+    return null;
+  }
+}

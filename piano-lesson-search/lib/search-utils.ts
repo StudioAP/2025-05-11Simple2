@@ -47,6 +47,10 @@ export async function searchSchools(
   params: SearchParams
 ): Promise<{ data: SearchResult[]; total: number }> {
   try {
+    const supabaseClient = typeof window === 'undefined' 
+      ? createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '')
+      : supabase;
+      
     const {
       keywords,
       area,
@@ -57,7 +61,7 @@ export async function searchSchools(
     } = params;
 
     // 検索クエリの構築
-    let query = supabase
+    let query = supabaseClient
       .from('schools')
       .select('*, school_views(count)', { count: 'exact' })
       .eq('is_published', true);
