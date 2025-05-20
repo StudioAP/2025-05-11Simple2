@@ -34,9 +34,14 @@ export function AnnouncementForm({ schoolId, initialData }: AnnouncementFormProp
 
   // Supabaseストレージから画像のURLを取得
   const getImageUrl = (path: string | null) => {
-    if (!path) return null;
-    const { data } = supabase.storage.from("announcement_photos").getPublicUrl(path);
-    return data.publicUrl;
+    try {
+      if (!path) return "/images/placeholder.jpg"; // デフォルト画像へのパス
+      const { data } = supabase.storage.from("announcement_photos").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Image URL取得エラー:", error);
+      return "/images/placeholder.jpg"; // エラー時もデフォルト画像
+    }
   };
 
   // ファイル選択ダイアログを開く
@@ -89,9 +94,18 @@ export function AnnouncementForm({ schoolId, initialData }: AnnouncementFormProp
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
+          onUploadProgress: (progress) => {
+            const percent = Math.round((progress.loaded / progress.total) * 100);
+            setUploadProgress(percent);
+          }
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        if (uploadError.statusCode === 403) {
+          throw new Error("アップロード権限がありません。管理者にお問い合わせください。");
+        }
+        throw uploadError;
+      }
 
       setPhotoPath(filePath);
       setSuccess("写真がアップロードされました");
@@ -228,11 +242,14 @@ export function AnnouncementForm({ schoolId, initialData }: AnnouncementFormProp
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
             <div className="relative w-full h-[200px] overflow-hidden rounded-md mb-4">
               <Image
-                src={getImageUrl(photoPath) || ""}
+                src={getImageUrl(photoPath) || "/images/placeholder.jpg"}
                 alt="お知らせ写真"
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                }}
               />
             </div>
             <Button
