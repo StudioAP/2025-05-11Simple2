@@ -1,0 +1,6 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect x="0" y="0" width="1200" height="20" fill="#3b82f6"/>
+  <text x="600" y="315" font-family="sans-serif" font-size="72" font-weight="bold" text-anchor="middle" fill="#1e3a8a">ピアノ・リトミック教室検索</text>
+  <text x="600" y="395" font-family="sans-serif" font-size="36" text-anchor="middle" fill="#475569">最適な教室を見つけよう</text>
+</svg>
