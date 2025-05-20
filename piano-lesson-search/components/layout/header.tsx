@@ -58,6 +58,26 @@ export default function Header() {
               >
                 ホーム
               </Link>
+              <Link
+                href="/search"
+                className={`px-3 py-2 text-sm rounded-md ${
+                  pathname.startsWith("/search")
+                    ? "text-primary font-medium"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
+                }`}
+              >
+                教室検索
+              </Link>
+              <Link
+                href="/about"
+                className={`px-3 py-2 text-sm rounded-md ${
+                  pathname === "/about"
+                    ? "text-primary font-medium"
+                    : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
+                }`}
+              >
+                当サイトについて
+              </Link>
               {isLoggedIn ? (
                 <Link
                   href="/dashboard"
@@ -145,6 +165,28 @@ export default function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               ホーム
+            </Link>
+            <Link
+              href="/search"
+              className={`block px-3 py-2 rounded-md ${
+                pathname.startsWith("/search")
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              教室検索
+            </Link>
+            <Link
+              href="/about"
+              className={`block px-3 py-2 rounded-md ${
+                pathname === "/about"
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              当サイトについて
             </Link>
             {isLoggedIn ? (
               <Link
