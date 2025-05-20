@@ -13,6 +13,7 @@ export const metadata = appConfigMetadata;
 // 動的インポート
 const Header = dynamic(() => import('@/components/layout/header'), { ssr: false });
 const AccessibilityMenu = dynamic(() => import('@/components/ui/accessibility-menu'), { ssr: false });
+const BackToTopButton = dynamic(() => import('../components/layout/back-to-top-button'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -50,16 +51,7 @@ export default function RootLayout({
                   </Link>
                 </div>
                 <div className="mt-4">
-                  <button
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="inline-flex items-center text-xs text-gray-500 dark:text-gray-500 hover:text-primary"
-                    aria-label="ページトップへ戻る"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4 mr-1">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
-                    ページトップへ戻る
-                  </button>
+                  <BackToTopButton />
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
                   Powered by{" "}
