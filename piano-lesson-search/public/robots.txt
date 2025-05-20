@@ -1,0 +1,9 @@
+# https://piano-rythmique.netlify.app/
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /_next/
+
+# SitemapはSSGの導入後に追加予定
+# Sitemap: https://piano-rythmique.netlify.app/sitemap.xml

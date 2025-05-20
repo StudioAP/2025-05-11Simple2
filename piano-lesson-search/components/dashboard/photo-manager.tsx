@@ -29,8 +29,14 @@ export function PhotoManager({ schoolId, photos: initialPhotos }: PhotoManagerPr
 
   // Supabaseストレージから画像のURLを取得
   const getImageUrl = (path: string) => {
-    const { data } = supabase.storage.from("school_photos").getPublicUrl(path);
-    return data.publicUrl;
+    try {
+      if (!path) return "/images/placeholder.jpg"; // デフォルト画像へのパス
+      const { data } = supabase.storage.from("school_photos").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Image URL取得エラー:", error);
+      return "/images/placeholder.jpg"; // エラー時もデフォルト画像
+    }
   };
 
   // ファイル選択ダイアログを開く
@@ -82,9 +88,18 @@ export function PhotoManager({ schoolId, photos: initialPhotos }: PhotoManagerPr
         .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
+          onUploadProgress: (progress) => {
+            const percent = Math.round((progress.loaded / progress.total) * 100);
+            setUploadProgress(percent);
+          }
         });
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        if (uploadError.statusCode === 403) {
+          throw new Error("アップロード権限がありません。管理者にお問い合わせください。");
+        }
+        throw uploadError;
+      }
 
       // データベースに写真情報を登録
       const newPhotoOrder = photos.length > 0 
@@ -239,6 +254,9 @@ export function PhotoManager({ schoolId, photos: initialPhotos }: PhotoManagerPr
                               fill
                               sizes="80px"
                               className="object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                              }}
                             />
                           </div>
                           <div>

@@ -40,15 +40,23 @@ export async function POST(request: NextRequest) {
     }
 
     // メール送信設定
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: process.env.SMTP_SECURE === "true",
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-      },
-    });
+    try {
+      const transportConfig = {
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || "587"),
+        secure: process.env.SMTP_SECURE === "true",
+      };
+      
+      if (process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+        Object.assign(transportConfig, {
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASSWORD,
+          }
+        });
+      }
+      
+      const transporter = nodemailer.createTransport(transportConfig);
 
     // 教室オーナー宛てのメール
     const ownerMailOptions = {
@@ -185,11 +193,25 @@ ${message}
     ]);
 
     return NextResponse.json({ success: true });
+    } catch (smtpError) {
+      console.error("SMTP設定エラー:", smtpError);
+      throw new Error("メールサーバーの設定に問題があります。管理者にお問い合わせください。");
+    }
   } catch (error) {
     console.error("メール送信エラー:", error);
-    const errorMessage = error instanceof Error ? error.message : "メール送信中にエラーが発生しました";
+    
+    let userMessage = "メール送信中にエラーが発生しました。しばらく経ってからもう一度お試しください。";
+    
+    if (error instanceof Error) {
+      if (error.message.includes("ECONNREFUSED")) {
+        userMessage = "メールサーバーに接続できませんでした。しばらく経ってからもう一度お試しください。";
+      } else if (error.message.includes("Authentication")) {
+        userMessage = "メールサーバーの認証に失敗しました。管理者にお問い合わせください。";
+      }
+    }
+    
     return NextResponse.json(
-      { error: errorMessage },
+      { error: userMessage },
       { status: 500 }
     );
   }

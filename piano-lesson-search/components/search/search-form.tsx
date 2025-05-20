@@ -39,7 +39,12 @@ export default function SearchForm() {
   };
 
   return (
-    <form onSubmit={handleSearch} className="space-y-4">
+    <form 
+      onSubmit={handleSearch} 
+      className="space-y-4"
+      action="/search" 
+      method="GET"
+    >
       <div className="space-y-3">
         {keywords.map((keyword, index) => (
           <div key={index} className="flex items-center">
@@ -50,6 +55,7 @@ export default function SearchForm() {
               type="text"
               value={keyword}
               onChange={(e) => handleKeywordChange(index, e.target.value)}
+              name={`keyword${index + 1}`}
               placeholder={`検索キーワード ${index + 1}`}
               className="flex-1"
               maxLength={50}
@@ -71,6 +77,13 @@ export default function SearchForm() {
       <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
         ※ 最大3つのキーワードで検索できます。キーワードを複数入力すると、すべてに一致する教室が検索されます。
       </p>
+      
+      {/* JavaScriptが無効な場合のメッセージ */}
+      <noscript>
+        <div className="mt-4 p-3 bg-yellow-100 text-yellow-800 rounded">
+          <p>※JavaScriptが無効になっています。基本的な検索は機能しますが、高度な検索機能を利用するにはJavaScriptを有効にしてください。</p>
+        </div>
+      </noscript>
     </form>
   );
 }

@@ -21,8 +21,14 @@ export function SchoolGallery({ photos }: SchoolGalleryProps) {
 
   // Supabaseストレージから画像のURLを取得
   const getImageUrl = (path: string) => {
-    const { data } = supabase.storage.from("school_photos").getPublicUrl(path);
-    return data.publicUrl;
+    try {
+      if (!path) return "/images/placeholder.jpg"; // デフォルト画像へのパス
+      const { data } = supabase.storage.from("school_photos").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Image URL取得エラー:", error);
+      return "/images/placeholder.jpg"; // エラー時もデフォルト画像
+    }
   };
 
   const handleThumbnailClick = (index: number) => {
@@ -42,6 +48,9 @@ export function SchoolGallery({ photos }: SchoolGalleryProps) {
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
           className="object-cover"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+          }}
         />
       </div>
 
@@ -61,6 +70,9 @@ export function SchoolGallery({ photos }: SchoolGalleryProps) {
                 fill
                 sizes="80px"
                 className="object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+                }}
               />
             </button>
           ))}
