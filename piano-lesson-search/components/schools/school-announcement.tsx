@@ -20,9 +20,14 @@ export function SchoolAnnouncement({ announcement }: SchoolAnnouncementProps) {
 
   // Supabaseストレージから画像のURLを取得
   const getImageUrl = (path: string) => {
-    if (!path) return null;
-    const { data } = supabase.storage.from("announcement_photos").getPublicUrl(path);
-    return data.publicUrl;
+    try {
+      if (!path) return "/images/placeholder.jpg"; // デフォルト画像へのパス
+      const { data } = supabase.storage.from("announcement_photos").getPublicUrl(path);
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Image URL取得エラー:", error);
+      return "/images/placeholder.jpg"; // エラー時もデフォルト画像
+    }
   };
 
   // 日付をフォーマット
@@ -51,11 +56,14 @@ export function SchoolAnnouncement({ announcement }: SchoolAnnouncementProps) {
       {announcement.photo_path && (
         <div className="relative w-full h-[200px] md:h-[300px] overflow-hidden rounded-lg">
           <Image
-            src={getImageUrl(announcement.photo_path) || ""}
+            src={getImageUrl(announcement.photo_path) || "/images/placeholder.jpg"}
             alt="お知らせの画像"
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = "/images/placeholder.jpg";
+            }}
           />
         </div>
       )}
