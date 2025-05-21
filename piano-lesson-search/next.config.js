@@ -25,7 +25,7 @@ const nextConfig = {
       },
     ],
   },
-  swcMinify: true,
+  // swcMinify: true, // Netlifyビルドエラーのためコメントアウト
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn'],
