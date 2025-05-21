@@ -30,7 +30,8 @@ const ThemeSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={"sm"}>
+        {/* Changed size from "sm" to make it at least 44x44. h-11 w-11 is 44x44px. */}
+        <Button variant="ghost" className="h-11 w-11 p-0 flex items-center justify-center">
           {theme === "light" ? (
             <Sun
               key="light"
@@ -57,15 +58,15 @@ const ThemeSwitcher = () => {
           value={theme}
           onValueChange={(e) => setTheme(e)}
         >
-          <DropdownMenuRadioItem className="flex gap-2" value="light">
+          <DropdownMenuRadioItem className="flex gap-2 min-h-[44px]" value="light">
             <Sun size={ICON_SIZE} className="text-muted-foreground" />{" "}
             <span>Light</span>
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="dark">
+          <DropdownMenuRadioItem className="flex gap-2 min-h-[44px]" value="dark">
             <Moon size={ICON_SIZE} className="text-muted-foreground" />{" "}
             <span>Dark</span>
           </DropdownMenuRadioItem>
-          <DropdownMenuRadioItem className="flex gap-2" value="system">
+          <DropdownMenuRadioItem className="flex gap-2 min-h-[44px]" value="system">
             <Laptop size={ICON_SIZE} className="text-muted-foreground" />{" "}
             <span>System</span>
           </DropdownMenuRadioItem>

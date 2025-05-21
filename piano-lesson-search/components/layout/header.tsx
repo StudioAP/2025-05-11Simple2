@@ -50,7 +50,7 @@ export default function Header() {
             <nav className="flex items-center space-x-4">
               <Link
                 href="/"
-                className={`px-3 py-2 text-sm rounded-md ${
+                className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                   pathname === "/"
                     ? "text-primary font-medium"
                     : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -60,7 +60,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/search"
-                className={`px-3 py-2 text-sm rounded-md ${
+                className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                   pathname.startsWith("/search")
                     ? "text-primary font-medium"
                     : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -70,7 +70,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/about"
-                className={`px-3 py-2 text-sm rounded-md ${
+                className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                   pathname === "/about"
                     ? "text-primary font-medium"
                     : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -81,7 +81,7 @@ export default function Header() {
               {isLoggedIn ? (
                 <Link
                   href="/dashboard"
-                  className={`px-3 py-2 text-sm rounded-md ${
+                  className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                     pathname.startsWith("/dashboard")
                       ? "text-primary font-medium"
                       : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -93,7 +93,7 @@ export default function Header() {
                 <>
                   <Link
                     href="/login"
-                    className={`px-3 py-2 text-sm rounded-md ${
+                    className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                       pathname === "/login"
                         ? "text-primary font-medium"
                         : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -103,7 +103,7 @@ export default function Header() {
                   </Link>
                   <Link
                     href="/signup"
-                    className={`px-3 py-2 text-sm rounded-md ${
+                    className={`px-3 py-2 text-sm rounded-md min-h-[44px] inline-flex items-center ${
                       pathname === "/signup"
                         ? "text-primary font-medium"
                         : "text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary"
@@ -114,14 +114,14 @@ export default function Header() {
                 </>
               )}
             </nav>
-            <ThemeSwitcher />
+            <ThemeSwitcher /> {/* Assuming ThemeSwitcher itself is 44x44 or has appropriate sizing */}
           </div>
 
           <div className="md:hidden flex items-center">
-            <ThemeSwitcher />
+            <ThemeSwitcher /> {/* Assuming ThemeSwitcher itself is 44x44 or has appropriate sizing */}
             <button
               onClick={toggleMenu}
-              className="ml-2 p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="ml-2 p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,7 @@ export default function Header() {
           <div className="py-2 px-4 space-y-1">
             <Link
               href="/"
-              className={`block px-3 py-2 rounded-md ${
+              className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                 pathname === "/"
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -168,7 +168,7 @@ export default function Header() {
             </Link>
             <Link
               href="/search"
-              className={`block px-3 py-2 rounded-md ${
+              className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                 pathname.startsWith("/search")
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -179,7 +179,7 @@ export default function Header() {
             </Link>
             <Link
               href="/about"
-              className={`block px-3 py-2 rounded-md ${
+              className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                 pathname === "/about"
                   ? "bg-primary/10 text-primary font-medium"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -191,7 +191,7 @@ export default function Header() {
             {isLoggedIn ? (
               <Link
                 href="/dashboard"
-                className={`block px-3 py-2 rounded-md ${
+                className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                   pathname.startsWith("/dashboard")
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -204,7 +204,7 @@ export default function Header() {
               <>
                 <Link
                   href="/login"
-                  className={`block px-3 py-2 rounded-md ${
+                  className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                     pathname === "/login"
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -215,7 +215,7 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/signup"
-                  className={`block px-3 py-2 rounded-md ${
+                  className={`block px-3 py-2 rounded-md min-h-[44px] flex items-center ${
                     pathname === "/signup"
                       ? "bg-primary/10 text-primary font-medium"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"

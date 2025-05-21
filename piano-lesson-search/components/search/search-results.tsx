@@ -203,7 +203,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
         <div className="text-center py-12">
           <Search className="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold mb-4">検索条件に一致する教室が見つかりませんでした</h3>
-          <p className="text-gray-500 mb-6">別のキーワードで検索するか、フィルターを変更してみてください。</p>
+          <p className="text-gray-500 mb-6">キーワードを変えて試してみてください。または、フィルター条件を変更・リセットして再度お試しください。</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/">
               <Button>トップページに戻る</Button>
@@ -233,11 +233,13 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
           <p className="text-sm text-gray-500">{totalCount}件の教室が見つかりました（{currentPage}/{totalPages}ページ）</p>
           <div className="flex items-center gap-2 mt-2 md:mt-0">
-            <Link href="/search" className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-              </svg>
-              検索条件を変更
+            <Link href="/search" className="text-sm text-blue-600 dark:text-blue-400 hover:underline p-2 inline-flex items-center rounded-md min-h-[44px]">
+              <span className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                検索条件を変更
+              </span>
             </Link>
           </div>
         </div>
@@ -267,7 +269,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
                     ウェブサイトを見る
                   </a>
                 )}
-                <p className="text-gray-700 dark:text-gray-300 mt-3">
+                <p className="text-gray-700 dark:text-gray-300 mt-3 leading-relaxed">
                   {school.description.length > 200 
                     ? `${school.description.substring(0, 200)}...` 
                     : school.description}
@@ -275,7 +277,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
               </div>
               <div className="flex-shrink-0">
                 <Link href={`/schools/${school.id}`}>
-                  <Button variant="outline">詳細を見る</Button>
+                  <Button variant="outline" size="lg">詳細を見る</Button>
                 </Link>
               </div>
             </div>
@@ -289,7 +291,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
           <Link 
             href={currentPage > 1 ? generatePaginationLink(currentPage - 1) : '#'}
             aria-disabled={currentPage <= 1}
-            className={`p-2 rounded-md ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+            className={`min-h-[44px] min-w-[44px] p-2 flex items-center justify-center rounded-md ${currentPage <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           >
             <ChevronLeft className="h-5 w-5" />
           </Link>
@@ -315,7 +317,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
               <Link 
                 key={pageNum}
                 href={generatePaginationLink(pageNum)}
-                className={`px-3 py-1 rounded-md ${currentPage === pageNum ? 'bg-primary text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                className={`min-h-[44px] px-3 flex items-center justify-center rounded-md ${currentPage === pageNum ? 'bg-primary text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
               >
                 {pageNum}
               </Link>
@@ -325,7 +327,7 @@ export function SearchResults({ keywords }: { keywords: string[] }) {
           <Link 
             href={currentPage < totalPages ? generatePaginationLink(currentPage + 1) : '#'}
             aria-disabled={currentPage >= totalPages}
-            className={`p-2 rounded-md ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+            className={`min-h-[44px] min-w-[44px] p-2 flex items-center justify-center rounded-md ${currentPage >= totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           >
             <ChevronRight className="h-5 w-5" />
           </Link>

@@ -16,7 +16,7 @@ export default function Footer() {
             href="/legal/terms" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
+            className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline inline-block p-2 min-h-[44px]"
           >
             利用規約
           </Link>
@@ -24,15 +24,21 @@ export default function Footer() {
             href="/legal/privacy" 
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
+            className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline inline-block p-2 min-h-[44px]"
           >
             プライバシーポリシー
+          </Link>
+          <Link 
+            href="/sitemap" 
+            className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline inline-block p-2 min-h-[44px]"
+          >
+            サイトマップ
           </Link>
         </div>
         <div className="mt-4">
           <button
             onClick={scrollToTop}
-            className="inline-flex items-center text-xs text-gray-500 dark:text-gray-500 hover:text-primary"
+            className="inline-flex items-center text-xs text-gray-500 dark:text-gray-500 hover:text-primary p-2 min-h-[44px]"
             aria-label="ページトップへ戻る"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-4 h-4 mr-1">

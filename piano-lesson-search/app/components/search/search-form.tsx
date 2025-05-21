@@ -28,7 +28,7 @@ const SearchForm: React.FC = () => {
           id="search-query"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Piano teacher, music theory, etc."
+          placeholder="キーワードを入力（例：初心者、子供向け）"
         />
       </div>
       <div>
@@ -39,8 +39,9 @@ const SearchForm: React.FC = () => {
           onChange={(e) => setLocation(e.target.value)}
           placeholder="City or zip code"
         />
+        <p className="text-xs text-gray-500 mt-1">例: 渋谷区、横浜市</p>
       </div>
-      <Button type="submit" className="w-full">Search</Button>
+      <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white py-3 text-lg">Search</Button>
     </form>
   );
 };

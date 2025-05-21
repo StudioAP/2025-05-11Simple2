@@ -47,32 +47,34 @@ export default function SearchForm() {
     <form onSubmit={handleSearch} className="space-y-4">
       <div className="space-y-3">
         {keywords.map((keyword, index) => (
-          <div key={index} className="flex items-center">
-            <label className="w-32 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div key={index} className="flex flex-col sm:flex-row sm:items-center">
+            <label htmlFor={`keyword-${index}`} className="w-full sm:w-32 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-0">
               キーワード {index + 1}:
             </label>
             <Input
+              id={`keyword-${index}`}
               type="text"
               value={keyword}
               onChange={(e) => handleKeywordChange(index, e.target.value)}
               placeholder={index === 0 ? "例: ピアノ教室 初心者" : index === 1 ? "例: 子供向け 個人レッスン" : "例: 駅近 グループレッスン"}
-              className="flex-1"
+              className="flex-1 h-11" // Added h-11
               maxLength={50}
               aria-label={`検索キーワード ${index + 1}`}
             />
           </div>
         ))}
         
-        <div className="flex items-center">
-          <label className="w-32 text-sm font-medium text-gray-700 dark:text-gray-300">
+        <div className="flex flex-col sm:flex-row sm:items-center">
+          <label htmlFor="area-input" className="w-full sm:w-32 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-0">
             エリア:
           </label>
           <Input
+            id="area-input"
             type="text"
             value={area}
             onChange={(e) => setArea(e.target.value)}
             placeholder="例: 東京都渋谷区 または 横浜市"
-            className="flex-1"
+            className="flex-1 h-11" // Added h-11
             maxLength={50}
             aria-label="エリア"
           />
@@ -82,7 +84,8 @@ export default function SearchForm() {
       <div className="flex justify-center gap-4 mt-6">
         <Button 
           type="submit" 
-          className="w-full sm:w-auto px-8 py-2"
+          size="lg" // Added size="lg"
+          className="w-full sm:w-auto px-8" // Removed py-2
           disabled={isSearching}
         >
           {isSearching ? "検索中..." : "検索する"}
@@ -90,8 +93,9 @@ export default function SearchForm() {
         <Button
           type="button"
           variant="outline"
+          size="lg" // Added size="lg"
           onClick={handleReset}
-          className="w-full sm:w-auto px-8 py-2"
+          className="w-full sm:w-auto px-8" // Removed py-2
         >
           リセット
         </Button>

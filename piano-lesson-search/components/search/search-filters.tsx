@@ -154,6 +154,18 @@ export function SearchFilters() {
     setSelectedTypes([]);
     setSelectedAreas([]);
     setSortBy("relevance");
+
+    // Preserve keywords and reset other filters in URL
+    const params = new URLSearchParams();
+    keywords.forEach((keyword, index) => {
+      if (keyword.trim() !== "") {
+        params.set(`keyword${index + 1}`, keyword);
+      }
+    });
+    // Optionally, reset to page 1
+    // params.set("page", "1"); // Or remove page parameter to default to 1
+
+    router.push(`/search?${params.toString()}`);
   };
 
   if (isLoading) {
@@ -166,7 +178,7 @@ export function SearchFilters() {
         <h3 className="font-medium mb-3">教室タイプ</h3>
         <div className="space-y-2">
           {schoolTypes.map((type) => (
-            <div key={type.id} className="flex items-center space-x-2">
+            <div key={type.id} className="flex items-center space-x-2 min-h-[44px] py-1"> {/* Ensure min height and some padding */}
               <Checkbox 
                 id={`type-${type.id}`} 
                 checked={selectedTypes.includes(type.id)}
@@ -184,7 +196,7 @@ export function SearchFilters() {
         <h3 className="font-medium mb-3">エリア</h3>
         <div className="space-y-2 max-h-40 overflow-y-auto pr-2">
           {areas.map((area) => (
-            <div key={area} className="flex items-center space-x-2">
+            <div key={area} className="flex items-center space-x-2 min-h-[44px] py-1"> {/* Ensure min height and some padding */}
               <Checkbox 
                 id={`area-${area}`} 
                 checked={selectedAreas.includes(area)}
@@ -201,7 +213,7 @@ export function SearchFilters() {
       <div>
         <h3 className="font-medium mb-3">並び替え</h3>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full h-11"> {/* Changed to h-11 */}
             <SelectValue placeholder="並び替え" />
           </SelectTrigger>
           <SelectContent>
@@ -215,10 +227,10 @@ export function SearchFilters() {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 pt-2">
-        <Button onClick={applyFilters} className="flex-1">
+        <Button onClick={applyFilters} size="lg" className="flex-1"> {/* Used size="lg", removed py-3 text-lg */}
           フィルターを適用
         </Button>
-        <Button variant="outline" onClick={resetFilters}>
+        <Button variant="outline" size="lg" onClick={resetFilters}> {/* Added size="lg" */}
           リセット
         </Button>
       </div>

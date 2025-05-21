@@ -1,4 +1,5 @@
 import SearchForm from '@/components/search/search-form';
+import HowToUse from '@/components/home/how-to-use'; // Import the new component
 
 export default async function Home() {
   return (
@@ -18,6 +19,9 @@ export default async function Home() {
           <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800 dark:text-gray-200">教室を検索</h2>
           <SearchForm />
         </div>
+
+        {/* How to Use Section */}
+        <HowToUse />
 
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">

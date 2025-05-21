@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { SearchResults } from '@/components/search/search-results';
 import { SearchFilters } from "@/components/search/search-filters";
 import { SlideIn } from '@/components/ui/animations/slide-in'; 
@@ -19,52 +20,94 @@ export default async function SearchPage({
   searchParams 
 }: SearchPageProps) {
   // キーワードを取得
-  const keywords = [];
-  for (let i = 1; i <= 3; i++) {
-    const keyword = searchParams[`keyword${i}`];
-    if (keyword && typeof keyword === "string" && keyword.trim() !== "") {
-      keywords.push(keyword.trim());
+  const searchKeywords: string[] = [];
+
+  // Standard keyword parameters
+  const k1Param = searchParams.keyword1;
+  const k2Param = searchParams.keyword2;
+  const k3Param = searchParams.keyword3;
+  
+  // Fallback parameters from the main page search form
+  const queryParam = searchParams.query; 
+  const locationParam = searchParams.location;
+
+  const firstKeyword = (k1Param && typeof k1Param === 'string' && k1Param.trim() !== "") 
+    ? k1Param.trim() 
+    : (queryParam && typeof queryParam === 'string' && queryParam.trim() !== "") 
+    ? queryParam.trim() 
+    : null;
+
+  if (firstKeyword) {
+    searchKeywords.push(firstKeyword);
+  }
+
+  const secondKeywordSource = (k2Param && typeof k2Param === 'string' && k2Param.trim() !== "") 
+    ? k2Param.trim()
+    : (locationParam && typeof locationParam === 'string' && locationParam.trim() !== "")
+    ? locationParam.trim()
+    : null;
+
+  if (secondKeywordSource) {
+    if (searchKeywords.length === 0 || (searchKeywords.length > 0 && searchKeywords[0] !== secondKeywordSource)) {
+      searchKeywords.push(secondKeywordSource);
+    }
+  }
+  
+  if (k3Param && typeof k3Param === 'string' && k3Param.trim() !== "") {
+    if (!searchKeywords.includes(k3Param.trim())) {
+      searchKeywords.push(k3Param.trim());
     }
   }
 
+  // Ensure we only take up to 3 unique keywords and filter out any empty strings
+  const keywords = Array.from(new Set(searchKeywords.filter(kw => kw.trim() !== ""))).slice(0, 3);
+
+  const breadcrumbItems = [
+    { href: "/", label: "ホーム" },
+    { label: "検索結果" }
+  ];
+
   return (
     <div className="container mx-auto py-8 px-4">
+      <Breadcrumbs items={breadcrumbItems} />
       {/* JavaScriptが無効な環境用のフォールバックフォーム */}
       <noscript>
-        <h1 className="text-3xl font-bold mb-8 text-center">教室検索</h1>
-        <form action="/search" method="get" className="mt-6 p-4 border rounded-lg bg-white">
+        {/* No h1 here, breadcrumbs are above. If a specific title is needed for noscript, it can be added. */}
+        <h1 className="text-3xl font-bold my-4 text-center sr-only">教室検索 (フォールバック)</h1> 
+        <form action="/search" method="get" className="mt-6 p-4 border rounded-lg bg-white dark:bg-gray-800">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="keyword1" className="block text-sm font-medium mb-1">キーワード</label>
+              <label htmlFor="keyword1" className="block text-sm font-medium mb-1 dark:text-gray-300">キーワード</label>
               <input 
                 type="text" 
                 id="keyword1" 
                 name="keyword1" 
                 defaultValue={typeof searchParams.keyword1 === 'string' ? searchParams.keyword1 : ''}
-                className="w-full px-3 py-2 border rounded"
-                placeholder="キーワードを入力"
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                placeholder="キーワードを入力（例：初心者、子供向け）"
               />
             </div>
             
             <div>
-              <label htmlFor="area" className="block text-sm font-medium mb-1">エリア</label>
+              <label htmlFor="area" className="block text-sm font-medium mb-1 dark:text-gray-300">エリア</label>
               <input 
                 type="text" 
                 id="area" 
                 name="area" 
                 defaultValue={typeof searchParams.area === 'string' ? searchParams.area : ''}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 placeholder="地域名を入力"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">例: 渋谷区、横浜市</p>
             </div>
             
             <div>
-              <label htmlFor="type" className="block text-sm font-medium mb-1">教室タイプ</label>
+              <label htmlFor="type" className="block text-sm font-medium mb-1 dark:text-gray-300">教室タイプ</label>
               <select 
                 id="type" 
                 name="type" 
                 defaultValue={typeof searchParams.type === 'string' ? searchParams.type : ''}
-                className="w-full px-3 py-2 border rounded"
+                className="w-full px-3 py-2 border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="">すべて</option>
                 <option value="ピアノ教室">ピアノ教室</option>
@@ -74,8 +117,8 @@ export default async function SearchPage({
             </div>
           </div>
           
-          <div className="mt-4 flex justify-end">
-            <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <div className="mt-4 flex flex-col sm:flex-row sm:justify-end">
+            <button type="submit" className="w-full sm:w-auto px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded text-lg dark:bg-primary-dark dark:hover:bg-primary-dark/90">
               検索する
             </button>
           </div>
@@ -87,8 +130,9 @@ export default async function SearchPage({
       
       {/* JavaScriptが有効な環境用の通常表示 */}
       <div className="js-only">
+        {/* The h1 is now part of the SlideIn to match the js-only section's title styling */}
         <SlideIn direction="down" duration={500}>
-          <h1 className="text-3xl font-bold mb-8 text-center">検索結果</h1>
+           <h1 className="text-3xl font-bold mb-8 text-center dark:text-gray-100">検索結果</h1>
         </SlideIn>
         
         <SlideIn direction="up" duration={500} delay={100}>

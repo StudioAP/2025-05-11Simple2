@@ -1,6 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 
 export const metadata: Metadata = {
   title: "当サイトについて | ピアノ・リトミック教室検索",
@@ -8,9 +9,15 @@ export const metadata: Metadata = {
 };
 
 export default function AboutPage() {
+  const breadcrumbItems = [
+    { href: "/", label: "ホーム" },
+    { label: "このサイトについて" }
+  ];
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">当サイトについて</h1>
+      <Breadcrumbs items={breadcrumbItems} />
+      <h1 className="text-3xl font-bold mb-8 text-center dark:text-gray-100">当サイトについて</h1>
       
       <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <section className="mb-8">

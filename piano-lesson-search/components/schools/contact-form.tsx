@@ -124,7 +124,7 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
           {schoolName}へのお問い合わせありがとうございます。<br />
           教室の担当者からの返信をお待ちください。
         </p>
-        <Button onClick={() => setSuccess(false)}>別のお問い合わせをする</Button>
+        <Button onClick={() => setSuccess(false)} size="lg">別のお問い合わせをする</Button> {/* Added size="lg" */}
       </div>
     );
   }
@@ -197,7 +197,7 @@ export function ContactForm({ schoolId, schoolName, contactEmail }: ContactFormP
       </div>
 
       <div className="flex justify-center">
-        <Button type="submit" disabled={isSubmitting} className="px-8">
+        <Button type="submit" disabled={isSubmitting} size="lg" className="w-full sm:w-auto px-8"> {/* Changed to w-full sm:w-auto */}
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
