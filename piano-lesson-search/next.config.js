@@ -32,7 +32,7 @@ const nextConfig = {
     } : false,
   },
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Netlifyデプロイエラーのため無効化
   },
   // ビルド時のTypeScriptチェックを無効にする
   typescript: {
