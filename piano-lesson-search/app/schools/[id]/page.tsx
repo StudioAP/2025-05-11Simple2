@@ -39,11 +39,11 @@ interface Announcement {
   created_at: string;
 }
 
-interface SchoolDetailPageProps {
-  params: { id: string };
-}
-
-export default async function SchoolDetailPage({ params }: SchoolDetailPageProps) {
+export default async function SchoolDetailPage({ 
+  params 
+}: { 
+  params: { id: string } 
+}) {
   const supabase = await createClient();
   
   const { data: school, error: schoolError } = await supabase
