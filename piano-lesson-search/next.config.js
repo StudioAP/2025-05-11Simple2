@@ -17,7 +17,22 @@ const nextConfig = {
         port: '',
         pathname: '/storage/v1/object/public/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'cedtxnycdwljvuruvvci.supabase.co',
+        port: '',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
+  },
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  experimental: {
+    optimizeCss: true,
   },
 };
 

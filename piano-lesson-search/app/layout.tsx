@@ -13,6 +13,7 @@ export const metadata = appConfigMetadata;
 // 動的インポート
 const Header = dynamic(() => import('@/components/layout/header'), { ssr: false });
 const AccessibilityMenu = dynamic(() => import('@/components/ui/accessibility-menu'), { ssr: false });
+const Footer = dynamic(() => import('@/components/layout/footer'), { ssr: false });
 
 export default function RootLayout({
   children,
@@ -30,38 +31,7 @@ export default function RootLayout({
               {children}
             </main>
             <AccessibilityMenu />
-            <footer className="border-t border-gray-200 dark:border-gray-800 py-8">
-              <div className="container mx-auto px-4 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  &copy; {new Date().getFullYear()} ピアノ・リトミック教室検索 All rights reserved.
-                </p>
-                <div className="flex justify-center space-x-4 mt-3">
-                  <Link 
-                    href="/legal/terms" 
-                    className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
-                  >
-                    利用規約
-                  </Link>
-                  <Link 
-                    href="/legal/privacy" 
-                    className="text-xs text-gray-500 dark:text-gray-500 hover:text-primary hover:underline"
-                  >
-                    プライバシーポリシー
-                  </Link>
-                </div>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
-                  Powered by{" "}
-                  <a
-                    href="https://supabase.com"
-                    target="_blank"
-                    className="text-primary hover:underline"
-                    rel="noreferrer"
-                  >
-                    Supabase
-                  </a>
-                </p>
-              </div>
-            </footer>
+            <Footer />
           </div>
         </Providers>
       </body>

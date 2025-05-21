@@ -48,6 +48,9 @@ export async function POST(request: NextRequest) {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
       },
+      tls: {
+        rejectUnauthorized: false  // セキュリティ警告: 開発環境のみで使用
+      }
     });
 
     // 教室オーナー宛てのメール
@@ -178,10 +181,21 @@ ${message}
 `,
     };
 
+    await transporter.verify().catch(err => {
+      console.error("SMTP verification error:", err);
+      throw new Error(`SMTP設定エラー: ${err.message}`);
+    });
+
     // メール送信
     await Promise.all([
-      transporter.sendMail(ownerMailOptions),
-      transporter.sendMail(userMailOptions),
+      transporter.sendMail(ownerMailOptions).catch(err => {
+        console.error("Owner email sending error:", err);
+        throw new Error(`教室オーナー宛メール送信エラー: ${err.message}`);
+      }),
+      transporter.sendMail(userMailOptions).catch(err => {
+        console.error("User email sending error:", err);
+        throw new Error(`問い合わせ者宛メール送信エラー: ${err.message}`);
+      }),
     ]);
 
     return NextResponse.json({ success: true });
