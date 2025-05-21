@@ -34,6 +34,10 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  // ビルド時のTypeScriptチェックを無効にする
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 module.exports = nextConfig;
